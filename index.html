@@ -8,12 +8,9 @@
         <script src="static/js/main.js"></script>
         <script>
             var params = {
-                api_url_clients: "http://localhost:8118/planes.json",
-                api_url_airports: "{{ url_for('api.airports') }}",
-                api_url_airports_tiles: "/api/airports/{x}/{y}/tile.json",
+                api_url_planes: "http://localhost:8118/planes.json",
                 api_url_route: "{{ url_for('api.route') }}",
                 api_url_tiles: "https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png",
-                api_url_stats: "{{ url_for('api.stats') }}"
             };
         </script>
         <script>
@@ -37,12 +34,6 @@
         </div>
         <footer>
             <div class="wrapper">
-                <ul class="layer-buttons">
-                    <li id="layer-button-world" title="Toggle world map"><i class="fa fa-globe"></i></li>
-                    <li id="layer-button-fir" title="Toggle FIRs"><i class="fa fa-square-o"></i></li>
-                    <li id="layer-button-airport" title="Toggle airports"><i class="fa fa-road"></i></li>
-                    <li id="layer-button-aircraft" title="Toggle clients"><i class="fa fa-plane"></i></li>
-                </ul>
                 <div class="links">
                     <a href="{{ url_for('core.stats') }}">Stats</a>
                 </div>

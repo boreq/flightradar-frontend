@@ -135,32 +135,6 @@ init = () ->
 
         map.render()
 
-
-    toggle = (e, layer) ->
-        visible = layer.getVisible()
-        layer.setVisible(!visible)
-        if visible
-            $(e.delegateTarget).addClass('hidden')
-        else
-            $(e.delegateTarget).removeClass('hidden')
-
-    $('#layer-button-world').on('click', (e) ->
-        toggle(e, worldLayer)
-    )
-
-    $('#layer-button-fir').on('click', (e) ->
-        toggle(e, firLayer)
-    )
-    $('#layer-button-fir').addClass('hidden')
-
-    $('#layer-button-airport').on('click', (e) ->
-        toggle(e, airportLayer)
-    )
-
-    $('#layer-button-aircraft').on('click', (e) ->
-        toggle(e, planeLayer)
-    )
-
     update(planesSource, dataSource)
 
 # Updates the data displayed in the sidebar
@@ -174,9 +148,8 @@ updateSidebar = (planesSource, dataSource) ->
                 break
 
 update = (planesSource, dataSource) ->
-    console.log('update')
     $.ajax
-        url: params.api_url_clients
+        url: params.api_url_planes
         type: 'GET'
         cache: false
     .done (response) ->
@@ -194,7 +167,7 @@ getPlaneStyle = (feature) ->
         image: new ol.style.Icon
             src: 'static/img/plane.png'
             rotation: rot
-    getResolutionStyle(2000, [planeStyle], [planeStyle, makeTextStyle(data.callsign)])
+    getResolutionStyle(2000, [planeStyle], [planeStyle, makeTextStyle(data.icao)])
 
 getStationaryPlaneStyle = (feature) ->
     data = feature.get('data')

@@ -73,10 +73,10 @@ displayPlane = (data, dataSource) ->
 
         <ul>
             <li><span>Flight:</span> #{data.flight_number}</li>
-            <li><span>Speed:</span> #{data.speed}</li>
-            <li><span>Heading:</span> #{data.heading}</li>
-            <li><span>Altitude:</span> #{data.altitude}</li>
             <li><span>Squawk:</span> #{data.transponder_code}</li>
+            <li><span>Heading:</span> #{data.heading}</li>
+            <li><span>Speed:</span> #{data.speed} <span class="dimmed">knots</span></li>
+            <li><span>Altitude:</span> #{data.altitude} <span class="dimmed">feet</span></li>
         </ul>
            """
 
@@ -99,61 +99,61 @@ displayPlane = (data, dataSource) ->
 
     sidebarDisplay(text)
 
-drawRoute = (data, dataSource) ->
-    dataSource.clear()
-
-    route = data.plan.origin + ' ' + data.plan.route + ' ' + data.plan.destination
-    $.ajax
-        url: params.api_url_route
-        type: 'GET'
-        data:
-            route: route
-    .done (response) ->
-        text = ""
-
-        # Assemble
-        coords = []
-        for point in response.route
-            if point.lon != null and point.lat != null
-                c = [point.lon, point.lat]
-                coord = ol.proj.fromLonLat(c)
-                coords.push(coord)
-                coordsText = renderCoords(point.lat, point.lon)
-            else
-                coordsText = '<i class="dimmed">Unknown.</i>'
-
-            text += """
-                <tr>
-                    <td>#{point.name}</td>
-                    <td>#{coordsText}</td>
-                </tr>
-                    """
-
-        text = """
-            <table>
-                <thead>
-                    <tr>
-                        <td>Name</td>
-                        <td>Position</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    #{text}
-                </tbody>
-            <table>
-                """
-
-        $('#sidebar-route').html(text)
-
-        # Draw
-        style = new ol.style.Style
-            stroke: new ol.style.Stroke
-                color: 'rgba(154, 18, 179, 0.8)'
-                lineDash: [5]
-        feature = new ol.Feature
-            geometry: new ol.geom.LineString(coords)
-        feature.setStyle(style)
-        dataSource.addFeature(feature)
-    .fail (jqXHR) ->
-        responseText = $.parseJSON(jqXHR.responseText)
-        $('#sidebar-route').html(getErrorIndicator(responseText.message))
+#drawRoute = (data, dataSource) ->
+#    dataSource.clear()
+#
+#    route = data.plan.origin + ' ' + data.plan.route + ' ' + data.plan.destination
+#    $.ajax
+#        url: params.api_url_route
+#        type: 'GET'
+#        data:
+#            route: route
+#    .done (response) ->
+#        text = ""
+#
+#        # Assemble
+#        coords = []
+#        for point in response.route
+#            if point.lon != null and point.lat != null
+#                c = [point.lon, point.lat]
+#                coord = ol.proj.fromLonLat(c)
+#                coords.push(coord)
+#                coordsText = renderCoords(point.lat, point.lon)
+#            else
+#                coordsText = '<i class="dimmed">Unknown.</i>'
+#
+#            text += """
+#                <tr>
+#                    <td>#{point.name}</td>
+#                    <td>#{coordsText}</td>
+#                </tr>
+#                    """
+#
+#        text = """
+#            <table>
+#                <thead>
+#                    <tr>
+#                        <td>Name</td>
+#                        <td>Position</td>
+#                    </tr>
+#                </thead>
+#                <tbody>
+#                    #{text}
+#                </tbody>
+#            <table>
+#                """
+#
+#        $('#sidebar-route').html(text)
+#
+#        # Draw
+#        style = new ol.style.Style
+#            stroke: new ol.style.Stroke
+#                color: 'rgba(154, 18, 179, 0.8)'
+#                lineDash: [5]
+#        feature = new ol.Feature
+#            geometry: new ol.geom.LineString(coords)
+#        feature.setStyle(style)
+#        dataSource.addFeature(feature)
+#    .fail (jqXHR) ->
+#        responseText = $.parseJSON(jqXHR.responseText)
+#        $('#sidebar-route').html(getErrorIndicator(responseText.message))
