@@ -8,7 +8,7 @@
         <script src="static/js/main.js"></script>
         <script>
             var params = {
-                api_url_clients: "{{ url_for('api.clients') }}",
+                api_url_clients: "http://localhost:8118/planes.json",
                 api_url_airports: "{{ url_for('api.airports') }}",
                 api_url_airports_tiles: "/api/airports/{x}/{y}/tile.json",
                 api_url_route: "{{ url_for('api.route') }}",
