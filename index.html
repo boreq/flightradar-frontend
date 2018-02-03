@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Flightradar</title>
+        <link rel="stylesheet" href="static/css/main.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+        <script src="static/js/main.js"></script>
+        <script>
+            var params = {
+                api_url_clients: "{{ url_for('api.clients') }}",
+                api_url_airports: "{{ url_for('api.airports') }}",
+                api_url_airports_tiles: "/api/airports/{x}/{y}/tile.json",
+                api_url_route: "{{ url_for('api.route') }}",
+                api_url_tiles: "https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png",
+                api_url_stats: "{{ url_for('api.stats') }}"
+            };
+        </script>
+        <script>
+            $(function() {
+                init();
+            });
+        </script>
+    </head>
+
+    <body id="body-index">
+        <div id="site">
+            <noscript>
+                <div class="nojs-main">
+                    <div class="wrapper">
+                        <p>The map requires JavaScript to function.</p>
+                    </div>
+                </div>
+            </noscript>
+            <div id="map" class="map"></div>
+            <div id="sidebar" class="sidebar"></div>
+        </div>
+        <footer>
+            <div class="wrapper">
+                <ul class="layer-buttons">
+                    <li id="layer-button-world" title="Toggle world map"><i class="fa fa-globe"></i></li>
+                    <li id="layer-button-fir" title="Toggle FIRs"><i class="fa fa-square-o"></i></li>
+                    <li id="layer-button-airport" title="Toggle airports"><i class="fa fa-road"></i></li>
+                    <li id="layer-button-aircraft" title="Toggle clients"><i class="fa fa-plane"></i></li>
+                </ul>
+                <div class="links">
+                    <a href="{{ url_for('core.stats') }}">Stats</a>
+                </div>
+            </div>
+        </footer>
+    </body>
+</html>
