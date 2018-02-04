@@ -223,7 +223,7 @@ getRangePointStyle = (value) ->
         image: new ol.style.Circle
             fill: new ol.style.Fill
                 color: 'rgba(41, 128, 185, 1)'
-            radius: 5
+            radius: 3
     textStyle = makeTextStyle(Math.round(value.distance) + 'km')
     return getResolutionStyle(700, [style], [style, textStyle])
 
