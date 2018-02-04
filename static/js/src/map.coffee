@@ -124,7 +124,6 @@ init = () ->
 	# From button
     $('#range-input-from').datetimepicker({
         onChangeDateTime: (dp, $input) ->
-            console.log(dp)
             rangeFrom = dp
     })
     $('#range-button-from').on('click', () ->
@@ -134,7 +133,6 @@ init = () ->
 	# To button
     $('#range-input-to').datetimepicker({
         onChangeDateTime: (dp, $input) ->
-            console.log(dp)
             rangeTo = dp
     })
     $('#range-button-to').on('click', () ->
@@ -249,7 +247,7 @@ drawRange = (rangeSource, planes) ->
         lon = parseFloat(v.data.longitude)
         lat = parseFloat(v.data.latitude)
         d = distance(params.longitude, params.latitude, lon, lat)
-        b = Math.round(bearing(params.longitude, params.latitude, lon, lat))
+        b = Math.round(bearing(params.longitude, params.latitude, lon, lat) / 5)
 
         if not data[b] or data[b].distance < d
             data[b] = {
@@ -261,7 +259,7 @@ drawRange = (rangeSource, planes) ->
     bearings = []
     for k, v of data
         bearings.push(k)
-    bearings.sort()
+    bearings.sort((e1, e2) -> e1 - e2)
 
     cord = []
     for k in bearings
