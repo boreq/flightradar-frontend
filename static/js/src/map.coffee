@@ -1,5 +1,5 @@
-textStrokeColor = '#fff'
-textFillColor = 'rgba(118, 135, 150, 1)'
+textStrokeColor = '#888'
+textFillColor = '#fff'
 textStrokeWidth = 2
 updateEvery = 10
 
@@ -32,6 +32,7 @@ init = () ->
         url: params.api_url_tiles
     worldLayer = new ol.layer.Tile
         source: sourceWorld
+        opacity: 0.5
 
     # Planes layer.
     planesSource = new ol.source.Vector({})
@@ -304,12 +305,14 @@ drawPlanes = (planesSource, planes) ->
         return null
 
     skippedPlanes = 0
+    renderedPlanes = 0
 
     for v in planes
         # Sanity check
         if not v.longitude or not v.latitude
             skippedPlanes++
             continue
+        renderedPlanes++
 
         # Convert coords
         c = [parseFloat(v.longitude), parseFloat(v.latitude)]
@@ -334,6 +337,7 @@ drawPlanes = (planesSource, planes) ->
             feature.setStyle(getPlaneStyle(feature))
 
     $('#unknown-position-planes').text(skippedPlanes)
+    $('#known-position-planes').text(renderedPlanes)
 
     # Function which looks for a callsign in new data
     findClient = (icao) ->
