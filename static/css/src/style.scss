@@ -235,3 +235,45 @@ ul {
 .flot-text {
     color: $text-color-dimmed !important;
 }
+
+.layer-buttons, .layer-buttons-range {
+    text-align: center;
+    display: inline-block;
+    border: 0;
+    margin: 0;
+
+    li {
+        display: block;
+        float: left;
+        margin: 1px;
+        padding: .5em;
+        width: 1em;
+        height: 1em;
+        cursor: pointer;
+    }
+
+    li:hover, li.hidden {
+        background-color: #fff;
+        color: #000;
+    }
+
+    li, li.hidden:hover {
+        color: #fff;
+    }
+}
+
+.layer-buttons {
+    li, li.hidden:hover {
+        background-color: $primary-color;
+    }
+}
+
+.layer-buttons-range {
+    li, li.hidden:hover {
+        background-color: #e67e22;
+    }
+}
+
+.range-hidden.hidden {
+    display: none;
+}

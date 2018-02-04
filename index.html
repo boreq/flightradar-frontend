@@ -4,13 +4,16 @@
         <meta charset="utf-8">
         <title>Flightradar</title>
         <link rel="stylesheet" href="static/css/main.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <script src="static/js/main.js"></script>
         <script>
+			var api_url = "http://localhost:8118";
             var params = {
-                api_url_planes: "http://localhost:8118/planes.json",
-                api_url_route: "{{ url_for('api.route') }}",
+                api_url_planes: api_url + "/planes.json",
+                api_url_range: api_url + "/planes.json",
                 api_url_tiles: "https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png",
+				latitude: 50.08179,
+				longitude: 19.97605
             };
         </script>
         <script>
@@ -34,8 +37,21 @@
         </div>
         <footer>
             <div class="wrapper">
-                <div class="links">
-                    <a href="{{ url_for('core.stats') }}">Stats</a>
+                <ul class="layer-buttons">
+                    <li id="layer-button-world" title="Toggle world map"><i class="fa fa-globe"></i></li>
+                    <li id="layer-button-polar" title="Toggle polar range"><i class="fa fa-circle"></i></li>
+                    <li id="layer-button-aircraft" title="Toggle planes"><i class="fa fa-plane"></i></li>
+                </ul>
+                <ul class="layer-buttons-range range-hidden">
+                    <li id="range-button-from" title="Lower time boundary"><i class="fa fa-caret-left"></i></li>
+                    <li id="range-button-to" title="Upper time boundary"><i class="fa fa-caret-right"></i></li>
+                    <li id="range-button-apply" title="Apply the time boundary"><i class="fa fa-check"></i></li>
+                </ul>
+				<input id="range-input-from" type="hidden">
+				<input id="range-input-to" type="hidden">
+                <div class="links range-hidden">
+                    <span>From: To: </span>
+                    <!--<a href="{{ url_for('core.stats') }}">Stats</a>-->
                 </div>
             </div>
         </footer>

@@ -1,13 +1,12 @@
 #!/bin/bash
 
-echo "Make sure that you have the following files:"
-echo "libs/jquery.js libs/ol-debug.js libs/jquery.timeago.js libs/flot/jquery.flot.js libs/flot/jquery.flot.time.js"
+echo "Make sure that you have the library files listed in this script"
 
 # CSS
-cat static/css/src/style.scss libs/ol.css | sass --stdin --scss | yui-compressor --type css > static/css/main.css
+cat static/css/src/style.scss libs/ol.css libs/jquery.datetimepicker.min.css | sass --stdin --scss | yui-compressor --type css > static/css/main.css
 
 # JS
-srcfiles=(libs/jquery.js libs/jquery.timeago.js libs/ol-debug.js libs/flot/jquery.flot.js libs/flot/jquery.flot.time.js static/js/src/map.coffee static/js/src/sidebar.coffee static/js/src/stats.coffee static/js/src/helpers.coffee)
+srcfiles=(libs/jquery.js libs/jquery.timeago.js libs/ol-debug.js libs/flot/jquery.flot.js libs/flot/jquery.flot.time.js static/js/src/map.coffee static/js/src/sidebar.coffee static/js/src/stats.coffee static/js/src/helpers.coffee libs/jquery.datetimepicker.full.min.js)
 for i in ${!srcfiles[*]}
 do
     tmpfiles[$i]=$(mktemp)
