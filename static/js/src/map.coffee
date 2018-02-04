@@ -152,11 +152,11 @@ init = () ->
 
 # Updates the data displayed in the sidebar
 updateSidebar = (planesSource, dataSource) ->
-    icao = $('#sidebar #plane-callsign')
-    if icao.length
+    flightNumber = $('#sidebar #plane-callsign')
+    if flightNumber.length
         for f in planesSource.getFeatures()
             d = f.get('data')
-            if d.icao == icao.text()
+            if d.flight_number == flightNumber.text()
                 displayPlane(d, dataSource)
                 break
 
@@ -303,9 +303,12 @@ drawPlanes = (planesSource, planes) ->
                 return f
         return null
 
+    skippedPlanes = 0
+
     for v in planes
         # Sanity check
-        if (not v.longitude or not v.latitude)
+        if not v.longitude or not v.latitude
+            skippedPlanes++
             continue
 
         # Convert coords
@@ -329,6 +332,8 @@ drawPlanes = (planesSource, planes) ->
             feature.setStyle(getStationaryPlaneStyle(feature))
         else
             feature.setStyle(getPlaneStyle(feature))
+
+    $('#unknown-position-planes').text(skippedPlanes)
 
     # Function which looks for a callsign in new data
     findClient = (icao) ->
