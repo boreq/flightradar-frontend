@@ -79,11 +79,6 @@ init = () ->
     interaction.on 'select', (e) ->
         dataSource.clear()
 
-        #for v in e.deselected
-        #    d = v.get('data')
-        #    if d.icao
-        #        v.setStyle(getAirportStyle(v))
-
         if e.selected.length == 0
             sidebarClear()
 
@@ -217,8 +212,6 @@ getStationPositionStyle = () ->
         image: new ol.style.Circle
             fill: new ol.style.Fill
                 color: 'rgba(214, 69, 65, 1)'
-            #stroke: new ol.style.Stroke
-            #    color: '#D64541'
             radius: 5
     textStyle = makeTextStyle('Station position')
     return getResolutionStyle(100, [style], [style, textStyle])
@@ -228,8 +221,6 @@ getRangePointStyle = (value) ->
         image: new ol.style.Circle
             fill: new ol.style.Fill
                 color: 'rgba(41, 128, 185, 1)'
-            #stroke: new ol.style.Stroke
-            #    color: '#D64541'
             radius: 5
     textStyle = makeTextStyle(Math.round(value.distance) + 'km')
     return getResolutionStyle(700, [style], [style, textStyle])
