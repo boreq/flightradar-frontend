@@ -20,57 +20,6 @@ makeTextStyle = (text) ->
                 color: textStrokeColor
                 width: textStrokeWidth
                 
-# Create a tiled ol.layer.Vector with ol.source.TileVector.
-makeTiledLayer = (url, style, maxResolution, extract, render) ->
-    downloaded = []
-    isDownloaded = (url) -> url in downloaded
-
-    source = new ol.source.TileVector
-        url: url
-        tileGrid: new ol.tilegrid.TileGrid
-            minZoom: 0
-            extent: ol.proj.get('EPSG:3857').getExtent()
-            origin: [-20037508.342789244, 20037508.342789244]
-            resolutions: [9783.93962050256]
-        projection: 'EPSG:3857',
-        tileLoadFunction: (url, callback) ->
-            if isDownloaded(url)
-                return
-
-            $.ajax(
-                url: url,
-                type: 'GET'
-            ).done (response) ->
-                if isDownloaded(url)
-                    return
-
-                downloaded.push url
-                features = []
-                data = extract(response)
-                for v in data
-                    # Convert coords.
-                    c = [v.lon, v.lat]
-                    cord = ol.proj.fromLonLat(c)
-
-                    # Create feature.
-                    if render == null || render == undefined
-                        feature = new ol.Feature
-                            geometry: new ol.geom.Point(cord)
-                            data: v
-                    else
-                        feature = render(cord, v)
-
-                    # Add feature.
-                    if feature != null
-                        features.push(feature)
-
-                callback(features)
-
-    new ol.layer.Vector
-        source: source
-        style: style
-        maxResolution: maxResolution
-
 # If passed to a style function alternates between two styles depending on the
 # current map resolution.
 getResolutionStyle = (thresholdResolution, styleAbove, styleBelow) ->
@@ -356,13 +305,6 @@ drawRange = (rangeSource, planes) ->
     feature.setGeometry(new ol.geom.Point(cord))
     feature.setStyle(getStationPositionStyle())
     rangeSource.addFeature(feature)
-
-    # Update custom properties
-    #feature.setProperties
-    #    data: v
-
-    # Update feature
-
 
 drawPlanes = (planesSource, planes) ->
     # Function which looks for a feature with the right callsign
