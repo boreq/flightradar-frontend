@@ -191,7 +191,11 @@ getPlaneStyle = (feature) ->
         image: new ol.style.Icon
             src: 'static/img/plane.png'
             rotation: rot
-    getResolutionStyle(2000, [planeStyle], [planeStyle, makeTextStyle(data.icao)])
+    if data.flight_number
+        label = data.flight_number
+    else
+        label = 'No callsign'
+    getResolutionStyle(2000, [planeStyle], [planeStyle, makeTextStyle(label)])
 
 getStationaryPlaneStyle = (feature) ->
     data = feature.get('data')

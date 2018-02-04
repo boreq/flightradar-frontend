@@ -1,3 +1,28 @@
+altitude1 = 2000
+altitude2 = 10000
+altitude3 = 20000
+altitude4 = 30000
+altitude5 = 50000
+
+pickColorForAltitude = (altitude) ->
+    if altitude < altitude1
+        return formatColor(255, 255 * altitudeAsFraction(altitude, 0, altitude1), 0, 1)
+    if altitude < altitude2
+        return formatColor(255 * (1 - altitudeAsFraction(altitude, altitude1, altitude2)), 255, 0, 1)
+    if altitude < altitude3
+        return formatColor(0, 255, 255 * altitudeAsFraction(altitude, altitude2, altitude3), 1)
+    if altitude < altitude4
+        return formatColor(0, 255 * (1 - altitudeAsFraction(altitude, altitude3, altitude4)), 255, 1)
+    if altitude < altitude5
+        return formatColor(255 * altitudeAsFraction(altitude, altitude4, altitude5), 0, 255, 1)
+    return formatColor(255, 0, 255, 1)
+
+altitudeAsFraction = (current, min, max) ->
+    return (current - min) / (max - min)
+
+formatColor = (r, g, b, a) ->
+    return "rgba(#{Math.round(r)}, #{Math.round(g)}, #{Math.round(b)}, #{a})"
+
 # Returns the jQuery element corresponding to the sidebar.
 getSidebar = () ->
     $('#sidebar')
@@ -24,7 +49,10 @@ getErrorIndicator = (text) ->
 
 getNumberOfDaysBetweenDates = (firstDate, secondDate) ->
     oneDay = 24 * 60 * 60 * 1000
-    return Math.round(Math.abs((firstDate.getTime() - secondDate.getTime())/(oneDay)))
+    return Math.round(Math.abs((firstDate - secondDate)/(oneDay)))
+
+getNumberOfSecondsBetweenDates = (firstDate, secondDate) ->
+    return Math.round(Math.abs((firstDate - secondDate)/(1000)))
 
 # Pans the map and zooms it on the specified coordinates.
 focusMap = (map, lat, lon) ->
@@ -71,11 +99,12 @@ displayPlane = (data, dataSource) ->
     text = """
         <h2>
             <i class="fa fa-plane"></i> 
-            <span id="plane-callsign">#{data.icao}</span>
+            <span id="plane-callsign">#{data.flight_number or 'No callsign'}</span>
             #{renderCoords(parseFloat(data.latitude), parseFloat(data.longitude))}
         </h2>
 
         <ul>
+            <li><span>ICAO:</span> #{data.icao}</li>
             <li><span>Flight:</span> #{data.flight_number}</li>
             <li><span>Squawk:</span> #{data.transponder_code}</li>
             <li><span>Heading:</span> #{data.heading}</li>
@@ -105,16 +134,33 @@ drawHistory = (data, dataSource) ->
         text = ""
 
         # Assemble
-        coords = []
         flights = {}
-        for data in response
+        for data, i in response
             if data.data.longitude and data.data.latitude
-                c = [data.data.longitude, data.data.latitude]
-                coord = ol.proj.fromLonLat(c)
-                coords.push(coord)
+                if i < response.length - 1 and getNumberOfSecondsBetweenDates(new Date(), Date.parse(data.time)) < 30 * 60
+                    coords = []
+
+                    c = [data.data.longitude, data.data.latitude]
+                    coord = ol.proj.fromLonLat(c)
+                    coords.push(coord)
+
+                    c = [response[i + 1].data.longitude, response[i + 1].data.latitude]
+                    coord = ol.proj.fromLonLat(c)
+                    coords.push(coord)
+
+                    # Draw segment
+                    style = new ol.style.Style
+                        stroke: new ol.style.Stroke
+                            color: pickColorForAltitude(parseFloat(data.data.altitude))
+                            #lineDash: [5]
+                            width: 2
+                    feature = new ol.Feature
+                        geometry: new ol.geom.LineString(coords)
+                    feature.setStyle(style)
+                    dataSource.addFeature(feature)
 
             if data.data.flight_number
-                daysPassed = getNumberOfDaysBetweenDates(new Date(), new Date())
+                daysPassed = getNumberOfDaysBetweenDates(new Date(), Date.parse(data.time))
                 if daysPassed in flights
                     if not data.data.flight_number in flights[daysPassed]
                         flights[daysPassed].push(data.data.flight_number)
@@ -164,75 +210,6 @@ drawHistory = (data, dataSource) ->
                 """
 
         $('#sidebar-seen').html(text)
-
-        # Draw
-        style = new ol.style.Style
-            stroke: new ol.style.Stroke
-                color: 'rgba(154, 18, 179, 0.8)'
-                lineDash: [5]
-        feature = new ol.Feature
-            geometry: new ol.geom.LineString(coords)
-        feature.setStyle(style)
-        dataSource.addFeature(feature)
     .fail (jqXHR) ->
         responseText = $.parseJSON(jqXHR.responseText)
         $('#sidebar-route').html(getErrorIndicator(responseText.message))
-
-#drawRoute = (data, dataSource) ->
-#    dataSource.clear()
-#
-#    route = data.plan.origin + ' ' + data.plan.route + ' ' + data.plan.destination
-#    $.ajax
-#        url: params.api_url_route
-#        type: 'GET'
-#        data:
-#            route: route
-#    .done (response) ->
-#        text = ""
-#
-#        # Assemble
-#        coords = []
-#        for point in response.route
-#            if point.lon != null and point.lat != null
-#                c = [point.lon, point.lat]
-#                coord = ol.proj.fromLonLat(c)
-#                coords.push(coord)
-#                coordsText = renderCoords(point.lat, point.lon)
-#            else
-#                coordsText = '<i class="dimmed">Unknown.</i>'
-#
-#            text += """
-#                <tr>
-#                    <td>#{point.name}</td>
-#                    <td>#{coordsText}</td>
-#                </tr>
-#                    """
-#
-#        text = """
-#            <table>
-#                <thead>
-#                    <tr>
-#                        <td>Name</td>
-#                        <td>Position</td>
-#                    </tr>
-#                </thead>
-#                <tbody>
-#                    #{text}
-#                </tbody>
-#            <table>
-#                """
-#
-#        $('#sidebar-route').html(text)
-#
-#        # Draw
-#        style = new ol.style.Style
-#            stroke: new ol.style.Stroke
-#                color: 'rgba(154, 18, 179, 0.8)'
-#                lineDash: [5]
-#        feature = new ol.Feature
-#            geometry: new ol.geom.LineString(coords)
-#        feature.setStyle(style)
-#        dataSource.addFeature(feature)
-#    .fail (jqXHR) ->
-#        responseText = $.parseJSON(jqXHR.responseText)
-#        $('#sidebar-route').html(getErrorIndicator(responseText.message))
