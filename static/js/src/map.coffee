@@ -175,8 +175,8 @@ update = (planesSource, dataSource) ->
         setTimeout(func, 1000 * updateEvery)
 
 updateRange = (rangeSource) ->
-    fromTimestamp = rangeFrom.getTime() / 1000
-    toTimestamp = rangeTo.getTime() / 1000
+    fromTimestamp = Math.round(rangeFrom.getTime() / 1000)
+    toTimestamp = Math.round(rangeTo.getTime() / 1000)
     $.ajax
         url: params.api_url_range
         type: 'GET'
@@ -237,24 +237,25 @@ getRangePolygonStyle = (value) ->
     })
 
 drawRange = (rangeSource, planes) ->
+    rangeSource.clear()
+
     # Draw polygon
     data = {}
 
     for v in planes
-        if not v.latitude and not v.longitude
+        if not v.data.latitude or not v.data.longitude
             continue
 
-        lon = parseFloat(v.longitude)
-        lat = parseFloat(v.latitude)
+        lon = parseFloat(v.data.longitude)
+        lat = parseFloat(v.data.latitude)
         d = distance(params.longitude, params.latitude, lon, lat)
         b = Math.round(bearing(params.longitude, params.latitude, lon, lat))
-        console.log(d, b)
 
         if not data[b] or data[b].distance < d
             data[b] = {
                 bearing: b
                 distance: d
-                v: v
+                v: v.data
             }
 
     bearings = []
@@ -265,15 +266,10 @@ drawRange = (rangeSource, planes) ->
     cord = []
     for k in bearings
         v = data[k]
-        console.log(k)
         c = [parseFloat(v.v.longitude), parseFloat(v.v.latitude)]
         c = ol.proj.fromLonLat(c)
         cord.push(c)
     cord.push(cord[0])
-
-    console.log(cord)
-
-    rangeSource.clear()
 
     feature = new ol.Feature({})
     feature.setGeometry(new ol.geom.Polygon([cord]))
