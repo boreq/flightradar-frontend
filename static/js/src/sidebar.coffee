@@ -40,7 +40,7 @@ focusMap = (map, lat, lon) ->
 
     map.beforeRender(pan, zoom)
     map.getView().setCenter(target)
-    map.getView().setZoom(7)
+    map.getView().setZoom(9)
 
 # Creates an html with coordinates.
 renderCoords = (lat, lon) ->
