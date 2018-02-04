@@ -55,8 +55,8 @@ init = () ->
         layers: [worldLayer, dataLayer, rangeLayer, planeLayer]
         controls: new ol.Collection()
         view: new ol.View
-            center: ol.proj.transform([20, 50], 'EPSG:4326', 'EPSG:3857')
-            zoom: 5
+            center: ol.proj.transform([params.longitude, params.latitude], 'EPSG:4326', 'EPSG:3857')
+            zoom: 8
 
     # Interaction.
     $(document).on('click', '.coords', (e) ->
