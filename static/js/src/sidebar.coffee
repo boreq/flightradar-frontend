@@ -22,6 +22,10 @@ getErrorIndicator = (text) ->
         <div class="error-indicator"><i class="fa fa-exclamation-triangle"></i><div>#{text}</div></div>
     """
 
+getNumberOfDaysBetweenDates = (firstDate, secondDate) ->
+    oneDay = 24 * 60 * 60 * 1000
+    return Math.round(Math.abs((firstDate.getTime() - secondDate.getTime())/(oneDay)))
+
 # Pans the map and zooms it on the specified coordinates.
 focusMap = (map, lat, lon) ->
     target = ol.proj.fromLonLat([lon, lat])
@@ -80,24 +84,99 @@ displayPlane = (data, dataSource) ->
         </ul>
            """
 
-    ## Flight plan info
-    #if data.plan.origin != '' || data.plan.destination != ''
-    #    text += """
-    #        <h3>Flight plan</h3>
-    #        <ul>
-    #            <li><span>Origin:</span> #{data.plan.origin}</li>
-    #            <li><span>Destination:</span> #{data.plan.destination}</li>
-    #            <li><span>Altitude:</span> #{data.plan.altitude}</li>
-    #            <li><span>Aircraft:</span> #{data.plan.aircraft}</li>
-    #        </ul>
-    #        <h4>Route</h4>
-    #        <div id="sidebar-route">
-    #            #{getLoadingIndicator()}
-    #        </div>
-    #            """
-    #    drawRoute(data, dataSource)
+    # Flight plan info
+    text += """
+        <h3>Previous sightings</h3>
+        <div id="sidebar-seen">
+            #{getLoadingIndicator()}
+        </div>
+            """
+    drawHistory(data, dataSource)
 
     sidebarDisplay(text)
+
+drawHistory = (data, dataSource) ->
+    dataSource.clear()
+
+    $.ajax
+        url: params.api_url_plane.replace('{icao}', data.icao)
+        type: 'GET'
+    .done (response) ->
+        text = ""
+
+        # Assemble
+        coords = []
+        flights = {}
+        for data in response
+            if data.data.longitude and data.data.latitude
+                c = [data.data.longitude, data.data.latitude]
+                coord = ol.proj.fromLonLat(c)
+                coords.push(coord)
+
+            if data.data.flight_number
+                daysPassed = getNumberOfDaysBetweenDates(new Date(), new Date())
+                if daysPassed in flights
+                    if not data.data.flight_number in flights[daysPassed]
+                        flights[daysPassed].push(data.data.flight_number)
+                else
+                    flights[daysPassed] = [data.data.flight_number]
+
+        daysAgo = []
+        for numberOfDays, flightList of flights
+            daysAgo.push(parseInt(numberOfDays))
+
+        i = 0
+        for numberOfDays in daysAgo
+            flightList = flights[numberOfDays]
+            flightText = ""
+            for flight, i in flightList
+                if i > 0
+                    flightText += ", "
+                flightText += flight
+
+            if parseInt(numberOfDays) == 0
+                daysText = "today"
+            else
+                daysText = "#{numberOfDays} days ago"
+            
+            text += """
+                <tr>
+                    <td>#{daysText}</td>
+                    <td>#{flightText}</td>
+                </tr>
+                    """
+            i++
+            if i > 30
+                break
+
+        text = """
+            <table>
+                <thead>
+                    <tr>
+                        <td>Time</td>
+                        <td>Flights</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    #{text}
+                </tbody>
+            <table>
+                """
+
+        $('#sidebar-seen').html(text)
+
+        # Draw
+        style = new ol.style.Style
+            stroke: new ol.style.Stroke
+                color: 'rgba(154, 18, 179, 0.8)'
+                lineDash: [5]
+        feature = new ol.Feature
+            geometry: new ol.geom.LineString(coords)
+        feature.setStyle(style)
+        dataSource.addFeature(feature)
+    .fail (jqXHR) ->
+        responseText = $.parseJSON(jqXHR.responseText)
+        $('#sidebar-route').html(getErrorIndicator(responseText.message))
 
 #drawRoute = (data, dataSource) ->
 #    dataSource.clear()
