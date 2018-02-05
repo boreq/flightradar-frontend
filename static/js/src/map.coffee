@@ -153,11 +153,11 @@ init = () ->
 
 # Updates the data displayed in the sidebar
 updateSidebar = (planesSource, dataSource) ->
-    flightNumber = $('#sidebar #plane-callsign')
-    if flightNumber.length
+    icao = $('#sidebar #plane-callsign')
+    if icao.length
         for f in planesSource.getFeatures()
             d = f.get('data')
-            if d.flight_number == flightNumber.text()
+            if d.icao == icao.text()
                 displayPlane(d, dataSource)
                 break
 

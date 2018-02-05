@@ -99,12 +99,12 @@ displayPlane = (data, dataSource) ->
     text = """
         <h2>
             <i class="fa fa-plane"></i> 
-            <span id="plane-callsign">#{data.flight_number or 'No callsign'}</span>
+            <span>#{data.flight_number or 'No callsign'}</span>
             #{renderCoords(parseFloat(data.latitude), parseFloat(data.longitude))}
         </h2>
 
         <ul>
-            <li><span>ICAO:</span> #{data.icao}</li>
+            <li><span>ICAO:</span> <span id="plane-callsign">#{data.icao}</span></li>
             <li><span>Flight:</span> #{data.flight_number}</li>
             <li><span>Squawk:</span> #{data.transponder_code}</li>
             <li><span>Heading:</span> #{data.heading}</li>
