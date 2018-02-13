@@ -160,6 +160,7 @@ drawHistory = (data, dataSource) ->
                     dataSource.addFeature(feature)
 
             if data.data.flight_number
+                console.log(data.data.flight_number)
                 daysPassed = getNumberOfDaysBetweenDates(new Date(), Date.parse(data.time))
                 if daysPassed in flights
                     if not data.data.flight_number in flights[daysPassed]

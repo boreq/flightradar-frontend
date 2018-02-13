@@ -177,7 +177,7 @@ updateRange = (rangeSource) ->
     fromTimestamp = Math.round(rangeFrom.getTime() / 1000)
     toTimestamp = Math.round(rangeTo.getTime() / 1000)
     $.ajax
-        url: params.api_url_range
+        url: params.api_url_polar
         type: 'GET'
         data:
             from: fromTimestamp
@@ -245,20 +245,17 @@ drawRange = (rangeSource, planes) ->
     # Draw polygon
     data = {}
 
-    for v in planes
-        if not v.data.latitude or not v.data.longitude
+    for k, v of planes
+        if not v.data.data.latitude or not v.data.data.longitude
             continue
 
-        lon = parseFloat(v.data.longitude)
-        lat = parseFloat(v.data.latitude)
-        d = distance(params.longitude, params.latitude, lon, lat)
-        b = Math.round(bearing(params.longitude, params.latitude, lon, lat) / 5)
+        k = Math.floor(k / 5)
 
-        if not data[b] or data[b].distance < d
-            data[b] = {
-                bearing: b
-                distance: d
-                v: v.data
+        if not data[k] or data[k].distance < v.distance
+            data[k] = {
+                bearing: k
+                distance: v.distance
+                v: v.data.data
             }
 
     bearings = []
