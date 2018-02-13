@@ -69,6 +69,13 @@ export class IndexComponent implements OnInit {
       })
     });
 
+    // Change cursor to pointer if a feature from the planeLayer is moused over.
+    map.on('pointermove', (evt) => {
+        map.getTargetElement().style.cursor =
+        map.hasFeatureAtPixel(evt.pixel, layer => layer == planeLayer) ? 'pointer' : '';
+      }
+    );
+
     // Clicking on coords.
     //$(document).on('click', '.coords', (e) ->
     //    focusMap(map,
