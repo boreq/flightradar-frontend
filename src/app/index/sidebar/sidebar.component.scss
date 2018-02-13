@@ -1,0 +1,60 @@
+@import "../../../variables.scss";
+
+.wrapper {
+  padding: 1em;
+
+  h2 {
+    border-bottom: 1px solid $border-color;
+    margin-top: 0;
+
+    .coords {
+      font-size: 10px;
+      float: right;
+      display: inline-block;
+    }
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+
+    span {
+      display: inline-block;
+      min-width: 6em;
+    }
+  }
+
+  table {
+    width: 100%;
+    thead {
+      color: $text-color-dimmed;
+    }
+  }
+
+  .loading-indicator, .error-indicator {
+    margin: 0 auto;
+    font-size: 25px;
+    text-align: center;
+  }
+
+  .loading-indicator {
+    color: $text-color-dimmed;
+  }
+
+  .error-indicator {
+    i {
+      color: #ff0000;
+    }
+
+    div {
+      color: $text-color-dimmed;
+      font-size: 15px;
+    }
+  }
+}
+
+app-coords {
+  font-size: 10px;
+  float: right;
+  display: inline-block;
+}

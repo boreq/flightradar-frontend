@@ -1,0 +1,26 @@
+<div id="container">
+    <div id="map" class="map"></div>
+    <div id="sidebar" class="sidebar"></div>
+    <app-sidebar *ngIf="selectedPlane" [plane]="selectedPlane"></app-sidebar>
+    <footer>
+        <div class="wrapper">
+            <ul class="layer-buttons">
+                <li id="layer-button-world" title="Toggle world map"><i class="fa fa-globe"></i></li>
+                <li id="layer-button-polar" title="Toggle polar range"><i class="fa fa-circle"></i></li>
+                <li id="layer-button-aircraft" title="Toggle planes"><i class="fa fa-plane"></i></li>
+            </ul>
+            <ul class="layer-buttons-range range-hidden">
+                <li id="range-button-from" title="Lower time boundary"><i class="fa fa-caret-left"></i></li>
+                <li id="range-button-to" title="Upper time boundary"><i class="fa fa-caret-right"></i></li>
+                <li id="range-button-apply" title="Apply the time boundary"><i class="fa fa-check"></i></li>
+            </ul>
+            <input id="range-input-from" type="hidden">
+            <input id="range-input-to" type="hidden">
+            <div class="links">
+              <span>{{ renderedPlanes }} planes + {{ skippedPlanes }} with unknown position</span>
+              &bull;
+              <a href="/stats">Stats</a>
+            </div>
+        </div>
+    </footer>
+</div>

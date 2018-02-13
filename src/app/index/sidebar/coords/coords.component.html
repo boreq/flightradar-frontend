@@ -1,0 +1,18 @@
+<span class="coords" [attr.lat]="latitude" [attr.lon]="longitude">
+  <i class="fa fa-globe"></i>
+
+  <span *ngIf="latitude >= 0">
+    {{latitude | number:'1.3-3'}}N
+  </span>
+  <span *ngIf="latitude <= 0">
+   {{-latitude | number:'1.3-3'}}S
+  </span>
+
+  <span *ngIf="longitude >= 0">
+    {{longitude | number:'1.3-3'}}E
+  </span>
+  <span *ngIf="longitude <= 0">
+   {{-longitude | number:'1.3-3'}}W
+  </span>
+
+</span>
