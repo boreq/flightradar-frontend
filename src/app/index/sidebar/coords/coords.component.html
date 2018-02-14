@@ -1,4 +1,4 @@
-<span class="coords" [attr.lat]="latitude" [attr.lon]="longitude">
+<span class="coords" [attr.lat]="latitude" [attr.lon]="longitude" (click)="onClick()">
   <i class="fa fa-globe"></i>
 
   <span *ngIf="latitude >= 0">

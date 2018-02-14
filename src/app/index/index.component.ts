@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { Plane } from '../plane';
 import { PlaneService } from '../plane.service';
+import { CoordsService } from '../coords.service';
 import { SidebarComponent } from './sidebar/sidebar.component';
 
 const position = {
@@ -27,7 +28,9 @@ export class IndexComponent implements OnInit {
 
   selectedPlane: Plane;
 
-  constructor(private planeService: PlaneService) { }
+  constructor(
+    private planeService: PlaneService,
+    private coordsService: CoordsService) { }
 
   ngOnInit() {
     // World layer.
@@ -77,12 +80,8 @@ export class IndexComponent implements OnInit {
     );
 
     // Clicking on coords.
-    //$(document).on('click', '.coords', (e) ->
-    //    focusMap(map,
-    //             parseFloat($(e.target).attr('lat')),
-    //             parseFloat($(e.target).attr('lon'))
-    //    )
-    //)
+    this.coordsService.coords$.subscribe(
+      coords => this.focusMap(map, coords.latitude, coords.longitude));
 
     // Selecting planes.
     let interaction = new ol.interaction.Select({
@@ -329,5 +328,28 @@ export class IndexComponent implements OnInit {
         })
       })
     });
+  }
+
+  // Pans the map and zooms it on the specified coordinates.
+  private focusMap(map, lat: number, lon: number) {
+    let target = ol.proj.fromLonLat([lon, lat]);
+    let duration = 2000;
+    let start = +new Date();
+
+    let pan = ol.animation.pan({
+      duration: duration,
+      source: map.getView().getCenter(),
+      start: start
+    });
+
+    let zoom = ol.animation.zoom({
+      duration: duration,
+      resolution: map.getView().getResolution(),
+      start: start
+    });
+
+    map.beforeRender(pan, zoom);
+    map.getView().setCenter(target);
+    map.getView().setZoom(9);
   }
 }

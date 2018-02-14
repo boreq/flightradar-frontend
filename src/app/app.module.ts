@@ -9,6 +9,7 @@ import { AppRoutingModule } from './/app-routing.module';
 import { SidebarComponent } from './index/sidebar/sidebar.component';
 import { PlaneService } from './plane.service';
 import { CoordsComponent } from './index/sidebar/coords/coords.component'
+import { CoordsService } from './coords.service';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { CoordsComponent } from './index/sidebar/coords/coords.component'
     AppRoutingModule
   ],
   providers: [
-    PlaneService
+    PlaneService,
+    CoordsService
   ],
   bootstrap: [AppComponent]
 })
