@@ -12,7 +12,8 @@ const position = {
 const textStrokeColor = '#888';
 const textFillColor = '#fff';
 const textStrokeWidth = 2;
-const updateEvery = 5;
+const updateEvery = 5; // How often the plane positions are updated [seconds]
+const featureClickTolerance = 5; // How much the clickable feature area is extended [pixels]
 
 declare var ol: any;
 
@@ -25,7 +26,6 @@ export class IndexComponent implements OnInit {
 
   skippedPlanes: number = 0;
   renderedPlanes: number = 0;
-
   selectedPlane: Plane;
 
   constructor(
@@ -75,7 +75,10 @@ export class IndexComponent implements OnInit {
     // Change cursor to pointer if a feature from the planeLayer is moused over.
     map.on('pointermove', (evt) => {
         map.getTargetElement().style.cursor =
-          map.hasFeatureAtPixel(evt.pixel, (layer) => layer == planeLayer) ? 'pointer' : '';
+          map.hasFeatureAtPixel(evt.pixel, {
+            layerFilter: (layer) => layer == planeLayer,
+            hitTolerance: featureClickTolerance
+          }) ? 'pointer' : '';
       }
     );
 
@@ -89,6 +92,7 @@ export class IndexComponent implements OnInit {
       condition: ol.events.condition.singleClick,
       layers: [planeLayer],
       multi: false,
+      hitTolerance: featureClickTolerance,
       filter: (feature) => {
         let d = feature.get('data');
         if (d.icao) {
