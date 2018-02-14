@@ -244,14 +244,33 @@ export class IndexComponent implements OnInit {
 
   private update(planesSource, dataSource) {
     this.planeService.getPlanes()
-      .subscribe((planes) => this.handlePlanes(planesSource, planes));
+      .subscribe((planes) => this.handlePlanes(planesSource, dataSource, planes));
 
     setTimeout(() => this.update(planesSource, dataSource), 1000 * updateEvery);
   }
 
-  private handlePlanes(planesSource, planes: Plane[]) {
+  private handlePlanes(planesSource, dataSource, planes: Plane[]) {
     // Render the planes on the map.
     this.renderPlanes(planesSource, planes);
+
+    // Update the drawn historical data.
+    if (this.selectedPlane != null &&
+        this.selectedPlaneHistory != null &&
+        this.selectedPlaneHistory.length != 0) {
+      for (let plane of planes) {
+        if (plane.icao == this.selectedPlane.icao) {
+          let last = this.selectedPlaneHistory[this.selectedPlaneHistory.length - 1];
+          if (last.data.latitude != plane.latitude || last.data.longitude != plane.longitude) {
+            let storedPlane = new StoredPlane();
+            storedPlane.time = (new Date()).toISOString();
+            storedPlane.data = plane;
+            this.selectedPlaneHistory.push(storedPlane);
+            dataSource.clear();
+            this.drawPlaneHistory(dataSource, this.selectedPlaneHistory);
+          }
+        }
+      }
+    }
 
     // Update the current data shown in the sidebar if needed.
     // TODO
@@ -271,7 +290,6 @@ export class IndexComponent implements OnInit {
     let skippedPlanes = 0;
     let renderedPlanes = 0;
 
-    console.log(planes);
     for (let v of planes) {
       // Sanity check
       if (!v.longitude || !v.latitude) {

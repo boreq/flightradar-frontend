@@ -51,6 +51,14 @@
       font-size: 15px;
     }
   }
+
+	.previous-sightings {
+		border-collapse: collapse;
+
+		> tbody > tr > td {
+				border-bottom: 1px solid #ddd;
+		}
+	}
 }
 
 app-coords {

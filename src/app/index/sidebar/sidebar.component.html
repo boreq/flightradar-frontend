@@ -17,7 +17,7 @@
   <div *ngIf="!previouslySeen" class="loading-indicator"><i class="fa fa-spinner fa-spin"></i></div>
   <div *ngIf="previouslySeen">
 		<h3>Previous sightings</h3>
-		<table>
+		<table class="previous-sightings">
 				<thead>
 						<tr>
 								<td>Time</td>
@@ -28,7 +28,11 @@
 						<tr *ngFor="let previous of previouslySeen">
 								<td *ngIf="previous.daysAgo == 0">today</td>
 								<td *ngIf="previous.daysAgo != 0">{{previous.daysAgo}} days ago</td>
-								<td>{{previous.flights.join(', ')}}</td>
+								<td>
+									<table>
+										<tr *ngFor="let flight of previous.flights"><td>{{flight}}</td></tr>
+									</table>
+								</td>
 						</tr>
 				</tbody>
 		</table>
