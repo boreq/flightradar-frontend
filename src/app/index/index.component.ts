@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Plane } from '../plane';
+import { StoredPlane, Plane } from '../plane';
 import { PlaneService } from '../plane.service';
 import { CoordsService } from '../coords.service';
 import { SidebarComponent } from './sidebar/sidebar.component';
+import { getNumberOfSecondsBetweenDates } from '../utils';
 
 const position = {
   latitude: 50.08179,
@@ -14,6 +15,12 @@ const textFillColor = '#fff';
 const textStrokeWidth = 2;
 const updateEvery = 5; // How often the plane positions are updated [seconds]
 const featureClickTolerance = 5; // How much the clickable feature area is extended [pixels]
+
+const altitude1 = 2000;
+const altitude2 = 10000;
+const altitude3 = 20000;
+const altitude4 = 30000;
+const altitude5 = 50000;
 
 declare var ol: any;
 
@@ -26,7 +33,9 @@ export class IndexComponent implements OnInit {
 
   skippedPlanes: number = 0;
   renderedPlanes: number = 0;
+
   selectedPlane: Plane;
+  selectedPlaneHistory: StoredPlane[];
 
   constructor(
     private planeService: PlaneService,
@@ -112,7 +121,7 @@ export class IndexComponent implements OnInit {
             let d = f.get('data')
             if (d.icao) {
               //displayPlane(d, dataSource)
-              this.selectPlane(d);
+              this.selectPlane(dataSource, d);
             }
         }
 
@@ -153,7 +162,7 @@ export class IndexComponent implements OnInit {
     //$('#layer-button-polar').addClass('hidden')
     //$('.range-hidden').addClass('hidden')
 
-	 //From button
+   //From button
     //$('#range-input-from').datetimepicker({
     //    onChangeDateTime: (dp, $input) ->
     //        rangeFrom = dp
@@ -162,7 +171,7 @@ export class IndexComponent implements OnInit {
     //    $('#range-input-from').datetimepicker('show')
     //)
 
-	 //To button
+   //To button
     //$('#range-input-to').datetimepicker({
     //    onChangeDateTime: (dp, $input) ->
     //        rangeTo = dp
@@ -183,12 +192,54 @@ export class IndexComponent implements OnInit {
     this.update(planesSource, dataSource)
   }
 
-  private selectPlane(plane: Plane) {
+  private selectPlane(dataSource, plane: Plane) {
     this.selectedPlane =  plane;
+    this.selectedPlaneHistory = null;
+
+    // Draw flight history.
+    dataSource.clear();
+    this.planeService.getPlane(plane.icao)
+      .subscribe((planeHistory) => {
+        this.selectedPlaneHistory = planeHistory;
+        this.drawPlaneHistory(dataSource, planeHistory);
+      });
   }
 
   private clearPlaneSelection() {
     this.selectedPlane = null;
+    this.selectedPlaneHistory = null;
+  }
+
+  private drawPlaneHistory(dataSource, planeHistory: StoredPlane[]) {
+    for (let i = 0; i < planeHistory.length; i++) {
+      let data = planeHistory[i];
+      if (data.data.longitude && data.data.latitude) {
+        if (i < planeHistory.length - 1 && getNumberOfSecondsBetweenDates(new Date(), Date.parse(data.time)) < 30 * 60) {
+          let coords = [];
+
+          let c = [data.data.longitude, data.data.latitude];
+          let coord = ol.proj.fromLonLat(c);
+          coords.push(coord);
+
+          c = [planeHistory[i + 1].data.longitude, planeHistory[i + 1].data.latitude];
+          coord = ol.proj.fromLonLat(c);
+          coords.push(coord);
+
+          // Line
+          let style = new ol.style.Style({
+            stroke: new ol.style.Stroke({
+              color: this.pickColorForAltitude(data.data.altitude),
+              width: 2
+            })
+          });
+          let feature = new ol.Feature({
+            geometry: new ol.geom.LineString(coords)
+          });
+          feature.setStyle(style);
+          dataSource.addFeature(feature);
+        }
+      }
+    }
   }
 
   private update(planesSource, dataSource) {
@@ -203,6 +254,7 @@ export class IndexComponent implements OnInit {
     this.renderPlanes(planesSource, planes);
 
     // Update the current data shown in the sidebar if needed.
+    // TODO
   }
 
   private renderPlanes(planesSource, planes: Plane[]) {
@@ -219,6 +271,7 @@ export class IndexComponent implements OnInit {
     let skippedPlanes = 0;
     let renderedPlanes = 0;
 
+    console.log(planes);
     for (let v of planes) {
       // Sanity check
       if (!v.longitude || !v.latitude) {
@@ -356,5 +409,27 @@ export class IndexComponent implements OnInit {
     map.beforeRender(pan, zoom);
     map.getView().setCenter(target);
     map.getView().setZoom(9);
+  }
+
+  private pickColorForAltitude(altitude: number): string {
+    if (altitude < altitude1)
+        return this.formatColor(255, 255 * this.altitudeAsFraction(altitude, 0, altitude1), 0, 1);
+    if (altitude < altitude2)
+        return this.formatColor(255 * (1 - this.altitudeAsFraction(altitude, altitude1, altitude2)), 255, 0, 1);
+    if (altitude < altitude3)
+        return this.formatColor(0, 255, 255 * this.altitudeAsFraction(altitude, altitude2, altitude3), 1);
+    if (altitude < altitude4)
+        return this.formatColor(0, 255 * (1 - this.altitudeAsFraction(altitude, altitude3, altitude4)), 255, 1);
+    if (altitude < altitude5)
+        return this.formatColor(255 * this.altitudeAsFraction(altitude, altitude4, altitude5), 0, 255, 1);
+    return this.formatColor(255, 0, 255, 1);
+  }
+
+  private altitudeAsFraction(current: number, min: number, max: number ): number {
+    return (current - min) / (max - min);
+  }
+
+  private formatColor(r: number, g: number, b: number, a: number): string {
+    return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a})`;
   }
 }

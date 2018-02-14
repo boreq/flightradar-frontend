@@ -13,4 +13,24 @@
     <li><span class="dimmed">Speed:</span> {{plane.speed}} <span class="dimmed">knots</span></li>
     <li><span class="dimmed">Altitude:</span> {{plane.altitude}} <span class="dimmed">feet</span></li>
   </ul>
+
+  <div *ngIf="!previouslySeen" class="loading-indicator"><i class="fa fa-spinner fa-spin"></i></div>
+  <div *ngIf="previouslySeen">
+		<h3>Previous sightings</h3>
+		<table>
+				<thead>
+						<tr>
+								<td>Time</td>
+								<td>Flights</td>
+						</tr>
+				</thead>
+				<tbody>
+						<tr *ngFor="let previous of previouslySeen">
+								<td *ngIf="previous.daysAgo == 0">today</td>
+								<td *ngIf="previous.daysAgo != 0">{{previous.daysAgo}} days ago</td>
+								<td>{{previous.flights.join(', ')}}</td>
+						</tr>
+				</tbody>
+		</table>
+	</div>
 </div>

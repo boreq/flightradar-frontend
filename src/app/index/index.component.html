@@ -1,7 +1,6 @@
 <div id="container">
     <div id="map" class="map"></div>
-    <div id="sidebar" class="sidebar"></div>
-    <app-sidebar *ngIf="selectedPlane" [plane]="selectedPlane"></app-sidebar>
+    <app-sidebar *ngIf="selectedPlane" [plane]="selectedPlane" [planeHistory]="selectedPlaneHistory"></app-sidebar>
     <footer>
         <div class="wrapper">
             <ul class="layer-buttons">
