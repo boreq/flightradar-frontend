@@ -253,12 +253,16 @@ export class IndexComponent implements OnInit {
     // Render the planes on the map.
     this.renderPlanes(planesSource, planes);
 
-    // Update the drawn historical data.
+    // Update the drawn historical data and the sidebar data.
     if (this.selectedPlane != null &&
         this.selectedPlaneHistory != null &&
         this.selectedPlaneHistory.length != 0) {
       for (let plane of planes) {
         if (plane.icao == this.selectedPlane.icao) {
+					// Update the point used for the sidebar.
+					this.selectedPlane = plane;
+
+					// Insert a fake historical point into the array.
           let last = this.selectedPlaneHistory[this.selectedPlaneHistory.length - 1];
           if (last.data.latitude != plane.latitude || last.data.longitude != plane.longitude) {
             let storedPlane = new StoredPlane();
