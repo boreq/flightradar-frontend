@@ -75,13 +75,14 @@ export class IndexComponent implements OnInit {
     // Change cursor to pointer if a feature from the planeLayer is moused over.
     map.on('pointermove', (evt) => {
         map.getTargetElement().style.cursor =
-        map.hasFeatureAtPixel(evt.pixel, layer => layer == planeLayer) ? 'pointer' : '';
+          map.hasFeatureAtPixel(evt.pixel, (layer) => layer == planeLayer) ? 'pointer' : '';
       }
     );
 
     // Clicking on coords.
     this.coordsService.coords$.subscribe(
-      coords => this.focusMap(map, coords.latitude, coords.longitude));
+      (coords) => this.focusMap(map, coords.latitude, coords.longitude)
+    );
 
     // Selecting planes.
     let interaction = new ol.interaction.Select({
@@ -188,7 +189,7 @@ export class IndexComponent implements OnInit {
 
   private update(planesSource, dataSource) {
     this.planeService.getPlanes()
-      .subscribe(planes => this.handlePlanes(planesSource, planes));
+      .subscribe((planes) => this.handlePlanes(planesSource, planes));
 
     setTimeout(() => this.update(planesSource, dataSource), 1000 * updateEvery);
   }
