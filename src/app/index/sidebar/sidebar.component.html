@@ -1,8 +1,8 @@
 <div *ngIf="plane" class="wrapper">
   <h2>
-      <i class="fa fa-plane"></i> 
-      <span>{{plane.flight_number || "No callsign"}}</span>
-      <app-coords [latitude]="plane.latitude" [longitude]="plane.longitude"></app-coords>
+    <i class="fa fa-plane"></i> 
+    <span>{{plane.flight_number || "No callsign"}}</span>
+    <app-coords [latitude]="plane.latitude" [longitude]="plane.longitude"></app-coords>
   </h2>
 
   <ul>
@@ -16,25 +16,25 @@
 
   <div *ngIf="!previouslySeen" class="loading-indicator"><i class="fa fa-spinner fa-spin"></i></div>
   <div *ngIf="previouslySeen">
-		<h3>Previous sightings</h3>
-		<table class="previous-sightings">
-				<thead>
-						<tr>
-								<td>Time</td>
-								<td>Flights</td>
-						</tr>
-				</thead>
-				<tbody>
-						<tr *ngFor="let previous of previouslySeen">
-								<td *ngIf="previous.daysAgo == 0">today</td>
-								<td *ngIf="previous.daysAgo != 0">{{previous.daysAgo}} days ago</td>
-								<td>
-									<table>
-										<tr *ngFor="let flight of previous.flights"><td>{{flight}}</td></tr>
-									</table>
-								</td>
-						</tr>
-				</tbody>
-		</table>
-	</div>
+    <h3>Previous sightings</h3>
+    <table class="previous-sightings">
+      <thead>
+        <tr>
+          <td>Time</td>
+          <td>Flights</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let previous of previouslySeen">
+          <td *ngIf="previous.daysAgo == 0">today</td>
+          <td *ngIf="previous.daysAgo != 0">{{previous.daysAgo}} days ago</td>
+          <td>
+            <table>
+              <tr *ngFor="let flight of previous.flights"><td>{{flight}}</td></tr>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
