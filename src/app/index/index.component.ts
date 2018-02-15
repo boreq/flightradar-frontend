@@ -217,13 +217,13 @@ export class IndexComponent implements OnInit {
         if (i < planeHistory.length - 1 && getNumberOfSecondsBetweenDates(new Date(), Date.parse(data.time)) < 30 * 60) {
           let coords = [];
 
-          let c = [data.data.longitude, data.data.latitude];
-          let coord = ol.proj.fromLonLat(c);
-          coords.push(coord);
+          let c1 = [data.data.longitude, data.data.latitude];
+          let coord1 = ol.proj.fromLonLat(c1);
+          coords.push(coord1);
 
-          c = [planeHistory[i + 1].data.longitude, planeHistory[i + 1].data.latitude];
-          coord = ol.proj.fromLonLat(c);
-          coords.push(coord);
+          let c2 = [planeHistory[i + 1].data.longitude, planeHistory[i + 1].data.latitude];
+          let coord2 = ol.proj.fromLonLat(c2);
+          coords.push(coord2);
 
           // Line
           let style = new ol.style.Style({
@@ -234,6 +234,21 @@ export class IndexComponent implements OnInit {
           });
           let feature = new ol.Feature({
             geometry: new ol.geom.LineString(coords)
+          });
+          feature.setStyle(style);
+          dataSource.addFeature(feature);
+
+          // Point
+          style = new ol.style.Style({
+            image: new ol.style.Circle({
+              fill: new ol.style.Fill({
+                color: this.pickColorForAltitude(data.data.altitude)
+              }),
+              radius: 2
+            })
+          });
+          feature = new ol.Feature({
+            geometry: new ol.geom.Point(coord1)
           });
           feature.setStyle(style);
           dataSource.addFeature(feature);
@@ -259,10 +274,10 @@ export class IndexComponent implements OnInit {
         this.selectedPlaneHistory.length != 0) {
       for (let plane of planes) {
         if (plane.icao == this.selectedPlane.icao) {
-					// Update the point used for the sidebar.
-					this.selectedPlane = plane;
+          // Update the point used for the sidebar.
+          this.selectedPlane = plane;
 
-					// Insert a fake historical point into the array.
+          // Insert a fake historical point into the array.
           let last = this.selectedPlaneHistory[this.selectedPlaneHistory.length - 1];
           if (last.data.latitude != plane.latitude || last.data.longitude != plane.longitude) {
             let storedPlane = new StoredPlane();
