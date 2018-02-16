@@ -389,7 +389,6 @@ export class IndexComponent implements OnInit {
 
   private getResolutionStyle(thresholdResolution, styleAbove, styleBelow) {
     return (resolution) => {
-      console.log(resolution);
       if (resolution < thresholdResolution) {
         return styleBelow;
       } else {
@@ -464,7 +463,6 @@ export class IndexComponent implements OnInit {
 
     for (let k in planes) {
       let v = planes[k];
-      console.log(k, v);
 
       if (!v.data.data.latitude || !v.data.data.longitude) {
         continue;
@@ -491,7 +489,6 @@ export class IndexComponent implements OnInit {
     for (let k in bearings) {
       let v = data[k];
       let c = [parseFloat(v.v.longitude), parseFloat(v.v.latitude)];
-      console.log(c);
       c = ol.proj.fromLonLat(c);
       cord.push(c);
     }
