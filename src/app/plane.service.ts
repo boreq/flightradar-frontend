@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 
 import { Stats, StoredPlane, Plane } from './plane';
@@ -28,10 +28,9 @@ export class PlaneService {
   }
 
   getPolar(from: Date, to: Date): Observable<any> {
-    let params = {
-      from: Math.round(from.getTime() / 1000)),
-      to: Math.round(to.getTime() / 1000))
-    };
+	let params = new HttpParams();
+	params.set('from', Math.round(from.getTime() / 1000).toString())
+	params.set('to', Math.round(to.getTime() / 1000).toString())
     return this.http.get<any>(this.polarApiUrl, { params: params });
   }
 

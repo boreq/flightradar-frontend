@@ -484,7 +484,7 @@ export class IndexComponent implements OnInit {
         continue;
       }
 
-      k = Math.floor(k / 5);
+      k = Math.floor(parseFloat(k) / 5).toString();
 
       if (!data[k] || data[k].distance < v.distance) {
         data[k] = {
@@ -529,7 +529,7 @@ export class IndexComponent implements OnInit {
 
     // Draw station position
     let c = [position.longitude, position.latitude];
-    let cord = ol.proj.fromLonLat(c);
+    cord = ol.proj.fromLonLat(c);
     feature = new ol.Feature({});
     feature.setGeometry(new ol.geom.Point(cord));
     feature.setStyle(this.getStationPositionStyle());
@@ -549,7 +549,7 @@ export class IndexComponent implements OnInit {
     return this.getResolutionStyle(600, [style], [style, textStyle])
   }
 
-  private getRangePolygonStyle(value): any {
+  private getRangePolygonStyle(): any {
     return new ol.style.Style({
       stroke: new ol.style.Stroke({
         color: 'rgba(41, 128, 185, 0.5)',
