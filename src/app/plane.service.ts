@@ -29,8 +29,8 @@ export class PlaneService {
 
   getPolar(from: Date, to: Date): Observable<any> {
 	let params = new HttpParams();
-	params.set('from', Math.round(from.getTime() / 1000).toString())
-	params.set('to', Math.round(to.getTime() / 1000).toString())
+	params = params.set('from', Math.round(from.getTime() / 1000).toString())
+	params = params.set('to', Math.round(to.getTime() / 1000).toString())
     return this.http.get<any>(this.polarApiUrl, { params: params });
   }
 
