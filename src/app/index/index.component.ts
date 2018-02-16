@@ -24,12 +24,26 @@ const altitude5 = 50000;
 
 declare var ol: any;
 
+class AvailableLayer {
+  constructor(public title: string, public faIcon: string; public layer: any) {}
+
+  onClick() {
+    if (this.layer.getVisible()) {
+      this.layer.setVisible(false);
+    } else {
+      this.layer.setVisible(true);
+    }
+  }
+};
+
 @Component({
   selector: 'app-index',
   templateUrl: './index.component.html',
   styleUrls: ['./index.component.scss']
 })
 export class IndexComponent implements OnInit {
+
+  availableLayers: AvailableLayer[];
 
   skippedPlanes: number = 0;
   renderedPlanes: number = 0;
@@ -129,6 +143,13 @@ export class IndexComponent implements OnInit {
       }
     );
     map.addInteraction(interaction)
+
+    // Buttons
+    this.availableLayers = [
+      new AvailableLayer('Toggle world map', 'fa-globe', worldLayer),
+      new AvailableLayer('Toggle polar range', 'fa-circle', rangeLayer),
+      new AvailableLayer('Toggle planes', 'fa-plane', planeLayer),
+    ];
 
     //# Buttons
     //toggle = (e, layer, onShow, onHide) ->
