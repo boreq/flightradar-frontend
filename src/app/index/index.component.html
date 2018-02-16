@@ -8,13 +8,15 @@
           <i class="fa {{al.faIcon}}"></i>
         </li>
       </ul>
-      <ul class="layer-buttons-range range-hidden">
+      <!--
+      <ul class="layer-buttons-range">
         <li id="range-button-from" title="Lower time boundary"><i class="fa fa-caret-left"></i></li>
         <li id="range-button-to" title="Upper time boundary"><i class="fa fa-caret-right"></i></li>
         <li id="range-button-apply" title="Apply the time boundary"><i class="fa fa-check"></i></li>
       </ul>
-      <input id="range-input-from" type="hidden">
-      <input id="range-input-to" type="hidden">
+      <input id="range-input-from" type="hidden" ng-model="rangeFrom">
+      <input id="range-input-to" type="hidden" ng-model="rangeTo">
+      -->
       <div class="links">
         <span>{{ renderedPlanes }} planes + {{ skippedPlanes }} with unknown position</span>
         &bull;

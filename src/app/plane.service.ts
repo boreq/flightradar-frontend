@@ -11,6 +11,7 @@ export class PlaneService {
   private planesApiUrl = this.apiUrl + '/planes.json';
   private planeApiUrl = this.apiUrl + "/plane/{icao}.json";
   private statsApiUrl = this.apiUrl + "/stats.json";
+  private polarApiUrl = this.apiUrl + "/polar.json";
 
   constructor(private http: HttpClient) { }
 
@@ -24,6 +25,14 @@ export class PlaneService {
 
   getStats(): Observable<Stats[]> {
     return this.http.get<Stats[]>(this.statsApiUrl);
+  }
+
+  getPolar(from: Date, to: Date): Observable<any> {
+    let params = {
+      from: Math.round(from.getTime() / 1000)),
+      to: Math.round(to.getTime() / 1000))
+    };
+    return this.http.get<any>(this.polarApiUrl, { params: params });
   }
 
 }

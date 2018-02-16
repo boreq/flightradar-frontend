@@ -77,6 +77,13 @@ export class IndexComponent implements OnInit {
       source: rangeSource,
       visible: false
     });
+    rangeLayer.on('change:visible', () => {
+      if (rangeLayer.getVisible()) {
+        this.updateRange(rangeSource);
+      } else {
+        console.log('turned off');
+      }
+    });
 
     // Selected feature data layer (flight path etc).
     let dataSource = new ol.source.Vector({});
@@ -134,7 +141,6 @@ export class IndexComponent implements OnInit {
         for (let f of e.selected) {
             let d = f.get('data')
             if (d.icao) {
-              //displayPlane(d, dataSource)
               this.selectPlane(dataSource, d);
             }
         }
@@ -144,44 +150,12 @@ export class IndexComponent implements OnInit {
     );
     map.addInteraction(interaction)
 
-    // Buttons
+    // Layer buttons
     this.availableLayers = [
       new AvailableLayer('Toggle world map', 'fa-globe', worldLayer),
       new AvailableLayer('Toggle polar range', 'fa-circle', rangeLayer),
       new AvailableLayer('Toggle planes', 'fa-plane', planeLayer),
     ];
-
-    //# Buttons
-    //toggle = (e, layer, onShow, onHide) ->
-    //    visible = layer.getVisible()
-    //    layer.setVisible(!visible)
-    //    if visible
-    //        $(e.delegateTarget).addClass('hidden')
-    //        if onHide
-    //            onHide()
-    //    else
-    //        $(e.delegateTarget).removeClass('hidden')
-    //        if onShow
-    //            onShow()
-
-    //$('#layer-button-world').on('click', (e) ->
-    //    toggle(e, worldLayer)
-    //)
-
-    //$('#layer-button-aircraft').on('click', (e) ->
-    //    toggle(e, planeLayer)
-    //)
-
-    //$('#layer-button-polar').on('click', (e) ->
-    //    toggle(e, rangeLayer, () ->
-    //        updateRange(rangeSource)
-    //        $('.range-hidden').removeClass('hidden')
-    //    , () -> 
-    //        $('.range-hidden').addClass('hidden')
-    //    )
-    //)
-    //$('#layer-button-polar').addClass('hidden')
-    //$('.range-hidden').addClass('hidden')
 
    //From button
     //$('#range-input-from').datetimepicker({
@@ -206,11 +180,8 @@ export class IndexComponent implements OnInit {
     //    updateRange(rangeSource)
     //)
 
-    //rangeTo = new Date()
-    //rangeFrom = new Date()
-    //rangeFrom.setDate(rangeFrom.getDate() - 1)
-
-    this.update(planesSource, dataSource)
+    // Trigger the first update.
+    this.update(planesSource, dataSource);
   }
 
   private selectPlane(dataSource, plane: Plane) {
@@ -311,9 +282,6 @@ export class IndexComponent implements OnInit {
         }
       }
     }
-
-    // Update the current data shown in the sidebar if needed.
-    // TODO
   }
 
   private renderPlanes(planesSource, planes: Plane[]) {
@@ -420,6 +388,7 @@ export class IndexComponent implements OnInit {
 
   private getResolutionStyle(thresholdResolution, styleAbove, styleBelow) {
     return (resolution) => {
+      console.log(resolution);
       if (resolution < thresholdResolution) {
         return styleBelow;
       } else {
@@ -489,5 +458,118 @@ export class IndexComponent implements OnInit {
 
   private formatColor(r: number, g: number, b: number, a: number): string {
     return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a})`;
+  }
+
+  private updateRange(rangeSource) {
+    let rangeTo = new Date();
+    let rangeFrom = new Date();
+    rangeFrom.setDate(rangeFrom.getDate() - 1);
+
+    this.planeService.getPolar(rangeFrom, rangeTo)
+      .subscribe((planes) => this.drawRange(rangeSource, planes));
+  }
+
+  private drawRange(rangeSource, planes) {
+    rangeSource.clear();
+
+    // Draw polygon
+    let data = {};
+
+    for (let k in planes) {
+      let v = planes[k];
+      console.log(k, v);
+
+      if (!v.data.data.latitude || !v.data.data.longitude) {
+        continue;
+      }
+
+      k = Math.floor(k / 5);
+
+      if (!data[k] || data[k].distance < v.distance) {
+        data[k] = {
+          bearing: k,
+          distance: v.distance,
+          v: v.data.data
+        };
+      }
+    }
+
+    let bearings = [];
+    for (let k in data) {
+      bearings.push(k);
+    }
+    bearings.sort((e1, e2) => e1 - e2);
+
+    let cord = [];
+    for (let k in bearings) {
+      let v = data[k];
+      let c = [parseFloat(v.v.longitude), parseFloat(v.v.latitude)];
+      console.log(c);
+      c = ol.proj.fromLonLat(c);
+      cord.push(c);
+    }
+    cord.push(cord[0]);
+
+    let feature = new ol.Feature({});
+    feature.setGeometry(new ol.geom.Polygon([cord]));
+    feature.setStyle(this.getRangePolygonStyle());
+    rangeSource.addFeature(feature);
+
+    // Draw every point position
+    for (let k in data) {
+      let v = data[k];
+      let c = [v.v.longitude, v.v.latitude];
+      let cord = ol.proj.fromLonLat(c);
+      let feature = new ol.Feature({});
+      feature.setGeometry(new ol.geom.Point(cord));
+      feature.setStyle(this.getRangePointStyle(v));
+      rangeSource.addFeature(feature);
+    }
+
+    // Draw station position
+    let c = [position.longitude, position.latitude];
+    let cord = ol.proj.fromLonLat(c);
+    feature = new ol.Feature({});
+    feature.setGeometry(new ol.geom.Point(cord));
+    feature.setStyle(this.getStationPositionStyle());
+    rangeSource.addFeature(feature);
+  }
+
+  private getRangePointStyle(value): any {
+    let style = new ol.style.Style({
+      image: new ol.style.Circle({
+        fill: new ol.style.Fill({
+          color: 'rgba(41, 128, 185, 1)'
+        }),
+        radius: 3
+      })
+    });
+    let textStyle = this.makeTextStyle(Math.round(value.distance) + 'km');
+    return this.getResolutionStyle(600, [style], [style, textStyle])
+  }
+
+  private getRangePolygonStyle(value): any {
+    return new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: 'rgba(41, 128, 185, 0.5)',
+        width: 2
+      }),
+      fill: new ol.style.Fill({
+        color: 'rgba(41, 128, 185, 0.3)'
+      })
+    });
+  }
+
+  private getStationPositionStyle(): any {
+    let style = new ol.style.Style({
+      image: new ol.style.Circle({
+        fill: new ol.style.Fill({
+          color: 'rgba(214, 69, 65, 1)'
+        }),
+        radius: 5
+      })
+    });
+    let textStyle = this.makeTextStyle('Station position');
+    return this.getResolutionStyle(100, [style], [style, textStyle]);
   }
 }
