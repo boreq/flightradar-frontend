@@ -13,3 +13,14 @@ export class StoredPlane {
   data: Plane;
   time: string;
 }
+
+export class DataPoint {
+  data_points_number: number;
+  planes_number: number;
+  flights_number: number;
+}
+
+export class Stats {
+  date: string;
+  data: DataPoint;
+}
