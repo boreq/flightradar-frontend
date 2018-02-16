@@ -418,25 +418,11 @@ export class IndexComponent implements OnInit {
 
   // Pans the map and zooms it on the specified coordinates.
   private focusMap(map, lat: number, lon: number) {
-    let target = ol.proj.fromLonLat([lon, lat]);
-    let duration = 2000;
-    let start = +new Date();
-
-    let pan = ol.animation.pan({
-      duration: duration,
-      source: map.getView().getCenter(),
-      start: start
-    });
-
-    let zoom = ol.animation.zoom({
-      duration: duration,
-      resolution: map.getView().getResolution(),
-      start: start
-    });
-
-    map.beforeRender(pan, zoom);
-    map.getView().setCenter(target);
-    map.getView().setZoom(9);
+    map.getView().animate({
+	  center: ol.proj.fromLonLat([lon, lat]),
+	  zoom: 9,
+	  duration: 2000
+	});
   }
 
   private pickColorForAltitude(altitude: number): string {
