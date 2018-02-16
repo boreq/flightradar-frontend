@@ -2,16 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 
+import { environment } from '../environments/environment';
 import { Stats, StoredPlane, Plane } from './plane';
 
 @Injectable()
 export class PlaneService {
 
-  private apiUrl = 'https://flightradar.0x46.net/api';
-  private planesApiUrl = this.apiUrl + '/planes.json';
-  private planeApiUrl = this.apiUrl + "/plane/{icao}.json";
-  private statsApiUrl = this.apiUrl + "/stats.json";
-  private polarApiUrl = this.apiUrl + "/polar.json";
+  private planesApiUrl = environment.baseApiUrl + '/planes.json';
+  private planeApiUrl = environment.baseApiUrl + "/plane/{icao}.json";
+  private statsApiUrl = environment.baseApiUrl + "/stats.json";
+  private polarApiUrl = environment.baseApiUrl + "/polar.json";
 
   constructor(private http: HttpClient) { }
 
