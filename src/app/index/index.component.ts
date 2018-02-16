@@ -25,7 +25,8 @@ const altitude5 = 50000;
 declare var ol: any;
 
 class AvailableLayer {
-  constructor(public title: string, public faIcon: string; public layer: any) {}
+
+  constructor(public title: string, public faIcon: string, public layer: any) {}
 
   onClick() {
     if (this.layer.getVisible()) {

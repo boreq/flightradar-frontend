@@ -18,6 +18,9 @@ export class DataPoint {
   data_points_number: number;
   planes_number: number;
   flights_number: number;
+  average_distance: number;
+  median_distance: number;
+  max_distance: number;
 }
 
 export class Stats {
