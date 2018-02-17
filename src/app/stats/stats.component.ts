@@ -23,13 +23,13 @@ export class StatsComponent implements OnInit {
     return Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision)
   }
 
-  private drawCharts(stats: Stats[]) {
+  private drawCharts(stats: Stats) {
     let labels = [];
 
     let dataPointsDataset = {
       label: "Number of data points",
       borderColor: 'rgb(231, 76, 60)',
-      backgroundColor: 'rgba(231, 76, 60, 0.5)',
+      backgroundColor: 'rgb(231, 76, 60)',
       fill: false,
       data: [],
     };
@@ -37,7 +37,7 @@ export class StatsComponent implements OnInit {
     let planesDataset = {
       label: "Number of unique planes",
       borderColor: 'rgb(52, 152, 219)',
-      backgroundColor: 'rgba(52, 152, 219, 0.5)',
+      backgroundColor: 'rgb(52, 152, 219)',
       fill: false,
       data: [],
     };
@@ -45,7 +45,7 @@ export class StatsComponent implements OnInit {
     let flightsDataset = {
       label: "Number of unique flights",
       borderColor: 'rgb(155, 89, 182)',
-      backgroundColor: 'rgba(155, 89, 182, 0.5)',
+      backgroundColor: 'rgb(155, 89, 182)',
       fill: false,
       data: [],
     };
@@ -53,7 +53,7 @@ export class StatsComponent implements OnInit {
     let medianRangeDataset = {
       label: "Median range",
       borderColor: 'rgb(155, 89, 182)',
-      backgroundColor: 'rgba(155, 89, 182, 0.5)',
+      backgroundColor: 'rgb(155, 89, 182)',
       fill: false,
       data: [],
     };
@@ -61,7 +61,7 @@ export class StatsComponent implements OnInit {
     let maxRangeDataset = {
       label: "Max range",
       borderColor: 'rgb(231, 76, 60)',
-      backgroundColor: 'rgba(231, 76, 60, 0.5)',
+      backgroundColor: 'rgb(231, 76, 60)',
       fill: false,
       data: [],
     };
@@ -69,19 +69,71 @@ export class StatsComponent implements OnInit {
     let averageRangeDataset = {
       label: "Average range",
       borderColor: 'rgb(46, 204, 113)',
-      backgroundColor: 'rgba(46, 204, 113, 0.5)',
+      backgroundColor: 'rgb(46, 204, 113)',
       fill: false,
       data: [],
     };
 
-    for (let s of stats) {
+    let altitudeCrossSectionDatasets = [];
+    let maxAltitudeCrossSectionKey = 0;
+
+    for (let s of stats.stats) {
       labels.push(s.date);
+
       dataPointsDataset.data.push(s.data.data_points_number);
       planesDataset.data.push(s.data.planes_number);
       flightsDataset.data.push(s.data.flights_number);
       medianRangeDataset.data.push(this.round(s.data.median_distance, 2));
       maxRangeDataset.data.push(this.round(s.data.max_distance, 2));
       averageRangeDataset.data.push(this.round(s.data.average_distance, 2));
+
+      // Find out how many cross section datasets are needed
+      for (let k in s.data.data_points_altitude_cross_section) {
+        let numK = parseInt(k);
+        if (numK > maxAltitudeCrossSectionKey) {
+          maxAltitudeCrossSectionKey = numK;
+        }
+      }
+    }
+
+    let colors = [
+      'rgb(26, 188, 156)',
+      'rgb(52, 152, 219)',
+      'rgb(46, 204, 113)',
+      'rgb(155, 89, 182)',
+      'rgb(52, 73, 94)',
+      'rgb(241, 196, 15)',
+      'rgb(230, 126, 34)',
+      'rgb(231, 76, 60)',
+    ];
+
+    // Create all needed cross section datasets
+    for (let i = 0; i <= maxAltitudeCrossSectionKey + 1; i++) {
+      let text = 'Unknown';
+      if (i != 0) {
+        let min = (i - 1) * stats.altitude_cross_section_step;
+        let max = min + stats.altitude_cross_section_step;
+        text = min.toString() + ' - ' + max.toString();
+      }
+      let dataset = {
+        label: text,
+        borderColor: colors[i % colors.length],
+        backgroundColor: colors[i % colors.length],
+        fill: false,
+        data: [],
+      };
+      altitudeCrossSectionDatasets.push(dataset);
+    }
+
+    // Fill the cross section datasets
+    for (let s of stats.stats) {
+      for (let k = -1; k <= maxAltitudeCrossSectionKey; k++) {
+        if (s.data.data_points_altitude_cross_section[k]) {
+          altitudeCrossSectionDatasets[k + 1].data.push(s.data.data_points_altitude_cross_section[k]);
+        } else {
+          altitudeCrossSectionDatasets[k + 1].data.push(0);
+        }
+      }
     }
 
     let chartDataPoints = new Chart('chart-data-points', {
@@ -90,34 +142,49 @@ export class StatsComponent implements OnInit {
         labels: labels,
         datasets: [dataPointsDataset]
       },
-      options: this.getChartOptions('Unique data points', false)
+      options: this.getChartOptions('Number of collected data points', false)
     });
 
     let chartPlanes = new Chart('chart-planes', {
       type: 'line',
       data: {
         labels: labels,
-        datasets: [planesDataset]
+        datasets: [planesDataset, flightsDataset]
       },
-      options: this.getChartOptions('Unique planes', false)
+      options: this.getChartOptions('Unique planes and flights', true)
     });
 
-    let chartFlights = new Chart('chart-flights', {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [flightsDataset]
-      },
-      options: this.getChartOptions('Unique flights', false)
-    });
-
-   let chartRange = new Chart('chart-range', {
+    let chartRange = new Chart('chart-range', {
       type: 'line',
       data: {
         labels: labels,
         datasets: [medianRangeDataset, maxRangeDataset, averageRangeDataset]
       },
-      options: this.getChartOptions('Range', true)
+      options: this.getChartOptions('Detection range grouped by bearing from the base station', true)
+    });
+
+    let chartAltitudeCrossSectionOptions = this.getChartOptions('Number of collected data points - altitude cross-section', true);
+    chartAltitudeCrossSectionOptions.scales = {
+      xAxes: [{
+        stacked: true,
+        display: false
+      }],
+      yAxes: [{
+        stacked: true
+      }]
+    };
+    chartAltitudeCrossSectionOptions.tooltips = {
+      position: 'nearest',
+      mode: 'nearest',
+      intersect: true
+    };
+    let chartAltitudeCrossSection = new Chart('chart-altitude-cross-section', {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: altitudeCrossSectionDatasets
+      },
+      options: chartAltitudeCrossSectionOptions
     });
 
   }
@@ -142,10 +209,10 @@ export class StatsComponent implements OnInit {
         }]
       },
       tooltips: {
-		position: 'nearest',
+        position: 'nearest',
         mode: 'index',
         intersect: true
-	  }
+      }
     };
   }
 

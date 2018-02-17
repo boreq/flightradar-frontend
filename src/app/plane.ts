@@ -16,6 +16,7 @@ export class StoredPlane {
 
 export class DataPoint {
   data_points_number: number;
+  data_points_altitude_cross_section: any;
   planes_number: number;
   flights_number: number;
   average_distance: number;
@@ -23,7 +24,12 @@ export class DataPoint {
   max_distance: number;
 }
 
-export class Stats {
+export class DailyStats {
   date: string;
   data: DataPoint;
+}
+
+export class Stats {
+  stats: DailyStats[];
+  altitude_cross_section_step: number;
 }

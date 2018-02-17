@@ -23,14 +23,14 @@ export class PlaneService {
     return this.http.get<StoredPlane[]>(this.planeApiUrl.replace('{icao}', icao));
   }
 
-  getStats(): Observable<Stats[]> {
-    return this.http.get<Stats[]>(this.statsApiUrl);
+  getStats(): Observable<Stats> {
+    return this.http.get<Stats>(this.statsApiUrl);
   }
 
   getPolar(from: Date, to: Date): Observable<any> {
-	let params = new HttpParams();
-	params = params.set('from', Math.round(from.getTime() / 1000).toString())
-	params = params.set('to', Math.round(to.getTime() / 1000).toString())
+    let params = new HttpParams();
+    params = params.set('from', Math.round(from.getTime() / 1000).toString())
+    params = params.set('to', Math.round(to.getTime() / 1000).toString())
     return this.http.get<any>(this.polarApiUrl, { params: params });
   }
 
