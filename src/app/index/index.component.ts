@@ -486,7 +486,7 @@ export class IndexComponent implements OnInit {
     bearings.sort((e1, e2) => e1 - e2);
 
     let cord = [];
-    for (let k in bearings) {
+    for (let k of bearings) {
       let v = data[k];
       let c = [parseFloat(v.v.longitude), parseFloat(v.v.latitude)];
       c = ol.proj.fromLonLat(c);
