@@ -4,18 +4,29 @@ import { StoredPlane, Plane } from '../plane';
 import { PlaneService } from '../plane.service';
 import { CoordsService } from '../coords.service';
 import { SidebarComponent } from './sidebar/sidebar.component';
-import { getNumberOfSecondsBetweenDates } from '../utils';
+import { getNumberOfSecondsBetweenDates, calculateNewLonLat, kilometers } from '../utils';
 
+// Station position.
 const position = {
   latitude: 50.08179,
   longitude:  19.97605
 };
+
+// How often the plane positions are updated [ms].
+const updateEvery = 5 * 1000;
+
+// How often the plane positions are interpolated [ms].
+const interpolateEvery = 100;
+
+// How much the clickable feature area is extended [pixels].
+const featureClickTolerance = 5;
+
+// Text styles.
 const textStrokeColor = '#888';
 const textFillColor = '#fff';
 const textStrokeWidth = 2;
-const updateEvery = 5; // How often the plane positions are updated [seconds]
-const featureClickTolerance = 5; // How much the clickable feature area is extended [pixels]
 
+// Altitude colors thresholds.
 const altitude1 = 2000;
 const altitude2 = 10000;
 const altitude3 = 20000;
@@ -48,6 +59,10 @@ export class IndexComponent implements OnInit {
 
   skippedPlanes: number = 0;
   renderedPlanes: number = 0;
+
+  planes: Plane[];
+  planePositionUpdateTimes = {};
+  interpolatedPlanePositions = {};
 
   selectedPlane: Plane;
   selectedPlaneHistory: StoredPlane[];
@@ -183,6 +198,7 @@ export class IndexComponent implements OnInit {
 
     // Trigger the first update.
     this.update(planesSource, dataSource);
+    this.interpolate(planesSource, dataSource);
   }
 
   private selectPlane(dataSource, plane: Plane) {
@@ -254,12 +270,110 @@ export class IndexComponent implements OnInit {
     this.planeService.getPlanes()
       .subscribe((planes) => this.handlePlanes(planesSource, dataSource, planes));
 
-    setTimeout(() => this.update(planesSource, dataSource), 1000 * updateEvery);
+    setTimeout(() => this.update(planesSource, dataSource), updateEvery);
+  }
+
+  private interpolate(planesSource, dataSource) {
+    if (this.planes) {
+      // Copy.
+      let planes = [];
+      for (let plane of this.planes) {
+        let copiedPlane = JSON.parse(JSON.stringify(plane));
+        let position = this.interpolatedPlanePositions[copiedPlane.icao]
+        if (position) {
+          copiedPlane.latitude = position.latitude;
+          copiedPlane.longitude = position.longitude;
+          planes.push(copiedPlane);
+        }
+      }
+
+      // Interpolate.
+      for (let plane of planes) {
+        if (!plane.longitude || !plane.latitude || !plane.heading || !plane.speed) {
+          continue;
+        }
+
+        //let ms = (new Date()).getTime() - Date.parse(this.planePositionUpdateTimes[plane.icao]);
+        let ms = interpolateEvery;
+        let distance = kilometers(plane.speed) * (ms / (1000.0 * 60.0 * 60.0));
+        let lonLat = calculateNewLonLat(plane.longitude, plane.latitude, plane.heading, distance);
+        plane.longitude = lonLat[0];
+        plane.latitude = lonLat[1];
+        this.interpolatedPlanePositions[plane.icao] = {
+          'longitude': plane.longitude,
+          'latitude': plane.latitude
+        };
+
+
+      }
+
+      // Update the drawn historical data.
+      if (this.selectedPlane != null &&
+          this.selectedPlaneHistory != null &&
+          this.selectedPlaneHistory.length != 0) {
+        for (let plane of planes) {
+          if (plane.icao == this.selectedPlane.icao) {
+            // Create a fake historical point.
+            let last = this.selectedPlaneHistory[this.selectedPlaneHistory.length - 1];
+            if (last.data.latitude != plane.latitude || last.data.longitude != plane.longitude) {
+              let storedPlane = new StoredPlane();
+              storedPlane.time = (new Date()).toISOString();
+              storedPlane.data = plane;
+
+              let copy = this.selectedPlaneHistory.slice();
+              copy.push(storedPlane);
+
+              // Render the real data and the fake interpolated point.
+              dataSource.clear();
+              this.drawPlaneHistory(dataSource, copy);
+            }
+          }
+        }
+      }
+
+      // Draw.
+      this.renderPlanes(planesSource, planes);
+    }
+
+    setTimeout(() => this.interpolate(planesSource, dataSource), interpolateEvery);
   }
 
   private handlePlanes(planesSource, dataSource, planes: Plane[]) {
-    // Render the planes on the map.
-    this.renderPlanes(planesSource, planes);
+    // Save the result for interpolation, if the position has changed remember
+    // that.
+    let findPlane = (icao) => {
+      if (this.planes) {
+        for (let c of this.planes) {
+          if (c.icao == icao) {
+            return c;
+          }
+        }
+      }
+      return null;
+    }
+
+    // Update the dates of last position updates.
+    for (let plane of planes) {
+      let currentPlane = findPlane(plane.icao);
+      if (!currentPlane || (currentPlane.longitude != plane.longitude && currentPlane.latitude != plane.latitude)) {
+        this.planePositionUpdateTimes[plane.icao] = new Date();
+        this.interpolatedPlanePositions[plane.icao] = {
+          latitude: plane.latitude,
+          longitude: plane.longitude
+        };
+      }
+    }
+
+    // Remove old.
+    for (let k in this.planePositionUpdateTimes) {
+      let date = this.planePositionUpdateTimes[k];
+      if (getNumberOfSecondsBetweenDates(date, new Date()) > 60 * 5) {
+        delete this.planePositionUpdateTimes[k];
+        delete this.interpolatedPlanePositions[k];
+      }
+    }
+
+    this.planes = planes;
 
     // Update the drawn historical data and the sidebar data.
     if (this.selectedPlane != null &&
@@ -424,18 +538,18 @@ export class IndexComponent implements OnInit {
 	});
   }
 
-  private pickColorForAltitude(altitude: number): string {
+  private pickColorForAltitude(altitude: number, opacity: number = 1.0): string {
     if (altitude < altitude1)
-        return this.formatColor(255, 255 * this.altitudeAsFraction(altitude, 0, altitude1), 0, 1);
+        return this.formatColor(255, 255 * this.altitudeAsFraction(altitude, 0, altitude1), 0, opacity);
     if (altitude < altitude2)
-        return this.formatColor(255 * (1 - this.altitudeAsFraction(altitude, altitude1, altitude2)), 255, 0, 1);
+        return this.formatColor(255 * (1 - this.altitudeAsFraction(altitude, altitude1, altitude2)), 255, 0, opacity);
     if (altitude < altitude3)
-        return this.formatColor(0, 255, 255 * this.altitudeAsFraction(altitude, altitude2, altitude3), 1);
+        return this.formatColor(0, 255, 255 * this.altitudeAsFraction(altitude, altitude2, altitude3), opacity);
     if (altitude < altitude4)
-        return this.formatColor(0, 255 * (1 - this.altitudeAsFraction(altitude, altitude3, altitude4)), 255, 1);
+        return this.formatColor(0, 255 * (1 - this.altitudeAsFraction(altitude, altitude3, altitude4)), 255, opacity);
     if (altitude < altitude5)
-        return this.formatColor(255 * this.altitudeAsFraction(altitude, altitude4, altitude5), 0, 255, 1);
-    return this.formatColor(255, 0, 255, 1);
+        return this.formatColor(255 * this.altitudeAsFraction(altitude, altitude4, altitude5), 0, 255, opacity);
+    return this.formatColor(255, 0, 255, opacity);
   }
 
   private altitudeAsFraction(current: number, min: number, max: number ): number {
@@ -556,4 +670,5 @@ export class IndexComponent implements OnInit {
     let textStyle = this.makeTextStyle('Station position');
     return this.getResolutionStyle(100, [style], [style, textStyle]);
   }
+
 }

@@ -164,15 +164,8 @@ export class StatsComponent implements OnInit {
     });
 
     let chartAltitudeCrossSectionOptions = this.getChartOptions('Number of collected data points - altitude cross-section', true);
-    chartAltitudeCrossSectionOptions.scales = {
-      xAxes: [{
-        stacked: true,
-        display: false
-      }],
-      yAxes: [{
-        stacked: true
-      }]
-    };
+    chartAltitudeCrossSectionOptions.scales.xAxes[0].stacked = true;
+    chartAltitudeCrossSectionOptions.scales.yAxes[0].stacked = true;
     chartAltitudeCrossSectionOptions.tooltips = {
       position: 'nearest',
       mode: 'nearest',
