@@ -643,7 +643,7 @@ export class IndexComponent implements OnInit {
       })
     });
     let textStyle = this.makeTextStyle(Math.round(value.distance) + 'km');
-    return this.getResolutionStyle(600, [style], [style, textStyle])
+    return this.getResolutionStyle(600, [], [style, textStyle])
   }
 
   private getRangePolygonStyle(): any {
