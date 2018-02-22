@@ -14,6 +14,10 @@
     <li><span class="dimmed">Altitude:</span> {{plane.altitude}} <span class="dimmed">feet</span></li>
   </ul>
 
+  <div class="chart">
+    <canvas id="chart-speed-altitude"></canvas>
+  </div>
+
   <div *ngIf="!previouslySeen" class="loading-indicator"><i class="fa fa-spinner fa-spin"></i></div>
   <div *ngIf="previouslySeen">
     <h3>Previous sightings</h3>

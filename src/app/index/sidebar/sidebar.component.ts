@@ -7,6 +7,10 @@ class PreviouslySeen {
   constructor(public daysAgo: number, public flights: string[]) {}
 }
 
+declare var Chart: any;
+
+const numberOfMinutesOnTheYAxis = 10;
+
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
@@ -25,6 +29,7 @@ export class SidebarComponent implements OnInit {
       return;
     }
 
+    // Generate the previously seen list.
     let flights = {};
     for (let data of value) {
         if (data.data.flight_number) {
@@ -51,6 +56,109 @@ export class SidebarComponent implements OnInit {
     }
 
     this.previouslySeen = previouslySeen;
+
+    // Generate data for the charts.
+    let altitudeDataset = {
+      label: "Altitude",
+      borderColor: 'rgb(231, 76, 60)',
+      backgroundColor: 'rgb(231, 76, 60)',
+      fill: false,
+      data: [],
+      pointRadius: 0,
+      yAxisID: 'y-axis-altitude',
+    };
+
+    let speedDataset = {
+      label: "Speed",
+      borderColor: 'rgb(52, 152, 219)',
+      backgroundColor: 'rgb(52, 152, 219)',
+      fill: false,
+      data: [],
+      pointRadius: 0,
+      yAxisID: 'y-axis-speed',
+    };
+
+    for (let data of value) {
+      let t = getNumberOfSecondsBetweenDates(Date.parse(data.time), new Date());
+      if (t > numberOfMinutesOnTheYAxis * 60) {
+        continue;
+      }
+
+      if (data.data.altitude) {
+        altitudeDataset.data.push({
+          x: new Date(data.time),
+          y: data.data.altitude
+        });
+      }
+
+      if (data.data.speed) {
+        speedDataset.data.push({
+          x: new Date(data.time),
+          y: data.data.speed
+        });
+      }
+    }
+
+    let chartAltitude = new Chart('chart-speed-altitude', {
+      type: 'line',
+      data: {
+        datasets: [altitudeDataset, speedDataset]
+      },
+      options: this.getChartOptions('Altitude and speed')
+    });
+
+  }
+
+  private getChartOptions(title: string): any {
+    return {
+      animation: false,
+      responsive: true,
+      maintainAspectRatio: false,
+      legend: {
+        display: true
+      },
+      title: {
+        display: false,
+        text: title
+      },
+      scales: {
+        xAxes: [{
+          display: false,
+          type: 'time',
+          time: {
+            max: new Date(),
+            min: new Date((new Date()).getTime() - numberOfMinutesOnTheYAxis * 60 * 1000),
+            tooltipFormat: 'll HH:mm:ss'
+          }
+        }],
+        yAxes: [{
+          display: true,
+          ticks: {
+            display: false,
+            min: 0
+          },
+          position: "left",
+          id: "y-axis-altitude",
+        },
+        {
+          display: true,
+          ticks: {
+            display: false,
+            min: 0
+          },
+          gridLines: {
+            display: false
+          },
+          position: "right",
+          id: "y-axis-speed",
+        }]
+      },
+      tooltips: {
+        position: 'nearest',
+        mode: 'index',
+        intersect: true
+      }
+    };
   }
 
   ngOnInit() {

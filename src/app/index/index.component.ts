@@ -303,8 +303,6 @@ export class IndexComponent implements OnInit {
           'longitude': plane.longitude,
           'latitude': plane.latitude
         };
-
-
       }
 
       // Update the drawn historical data.
@@ -391,6 +389,8 @@ export class IndexComponent implements OnInit {
             storedPlane.time = (new Date()).toISOString();
             storedPlane.data = plane;
             this.selectedPlaneHistory.push(storedPlane);
+            // Trigger @Input() in child components (sidebar)
+            this.selectedPlaneHistory = this.selectedPlaneHistory.slice();
             dataSource.clear();
             this.drawPlaneHistory(dataSource, this.selectedPlaneHistory);
           }
@@ -532,10 +532,10 @@ export class IndexComponent implements OnInit {
   // Pans the map and zooms it on the specified coordinates.
   private focusMap(map, lat: number, lon: number) {
     map.getView().animate({
-	  center: ol.proj.fromLonLat([lon, lat]),
-	  zoom: 9,
-	  duration: 2000
-	});
+    center: ol.proj.fromLonLat([lon, lat]),
+    zoom: 9,
+    duration: 2000
+  });
   }
 
   private pickColorForAltitude(altitude: number, opacity: number = 1.0): string {
