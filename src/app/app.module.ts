@@ -10,6 +10,8 @@ import { SidebarComponent } from './index/sidebar/sidebar.component';
 import { PlaneService } from './plane.service';
 import { CoordsComponent } from './index/sidebar/coords/coords.component'
 import { CoordsService } from './coords.service';
+import { PlaneComponent } from './plane/plane.component';
+import { PageheaderComponent } from './pageheader/pageheader.component';
 
 
 @NgModule({
@@ -18,7 +20,9 @@ import { CoordsService } from './coords.service';
     IndexComponent,
     StatsComponent,
     SidebarComponent,
-    CoordsComponent
+    CoordsComponent,
+    PlaneComponent,
+    PageheaderComponent
   ],
   imports: [
     BrowserModule,
