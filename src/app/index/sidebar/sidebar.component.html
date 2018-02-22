@@ -2,16 +2,41 @@
   <h2>
     <i class="fa fa-plane"></i> 
     <span>{{plane.flight_number || "No callsign"}}</span>
-    <app-coords [latitude]="plane.latitude" [longitude]="plane.longitude"></app-coords>
+    <a class="plane-view-link" href="/plane/{{plane.icao}}">
+      <i class="fa fa-info"></i>
+    </a>
   </h2>
 
   <ul>
-    <li><span class="dimmed">ICAO:</span> {{plane.icao}}</li>
-    <li><span class="dimmed">Flight:</span> {{plane.flight_number}}</li>
-    <li><span class="dimmed">Squawk:</span> {{("00000"+plane.transponder_code).slice(-4)}}</li>
-    <li><span class="dimmed">Heading:</span> {{plane.heading}}</li>
-    <li><span class="dimmed">Speed:</span> {{plane.speed}} <span class="dimmed">knots</span></li>
-    <li><span class="dimmed">Altitude:</span> {{plane.altitude}} <span class="dimmed">feet</span></li>
+    <li>
+      <span class="dimmed">Position:</span> 
+      <app-coords [latitude]="plane.latitude" [longitude]="plane.longitude"></app-coords>
+    </li>
+    <li>
+      <span class="dimmed">ICAO:</span>
+      {{plane.icao}}
+    </li>
+    <li>
+      <span class="dimmed">Flight:</span>
+      {{plane.flight_number}}
+    </li>
+    <li>
+      <span class="dimmed">Squawk:</span>
+      {{("00000"+plane.transponder_code).slice(-4)}}
+    </li>
+    <li>
+      <span class="dimmed">Heading:</span>
+      {{plane.heading}}
+    </li>
+    <li>
+      <span class="dimmed">Speed:</span>
+      {{plane.speed}} <span class="dimmed">knots</span>
+    </li>
+    <li>
+      <span class="dimmed">Altitude:</span>
+      {{plane.altitude}}
+      <span class="dimmed">feet</span>
+    </li>
   </ul>
 
   <div class="chart">

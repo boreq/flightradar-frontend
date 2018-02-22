@@ -1,12 +1,56 @@
 <div class="main-container">
-  <app-pageheader title="Plane" fontAwesome="fa-plane"></app-pageheader>
+  <app-pageheader [title]="icao" fontAwesome="fa-plane"></app-pageheader>
 
   <div class="wrapper">
-      test
+    <div class="chart">
+      <canvas id="chart-speed-altitude"></canvas>
+    </div>
+    <div class="chart chart-flights">
+      <canvas id="chart-flights"></canvas>
+    </div>
   </div>
 
-  <div class="wrapper">
-      test
+  <div *ngIf="stats">
+
+    <div class="flex">
+      <div class="element-wrapper">
+        <div class="element">
+          <h2>First sighting</h2>
+          {{stats.firstSighting | timeAgo}}
+        </div>
+      </div>
+
+      <div class="element-wrapper">
+        <div class="element">
+          <h2>Last sighting</h2>
+          {{stats.lastSighting | timeAgo}}
+        </div>
+      </div>
+
+      <div class="element-wrapper">
+        <div class="element">
+          <h2>Numbers of sigtings</h2>
+          {{stats.numberOfOverflies}}
+        </div>
+      </div>
+    </div>
+
+    <div class="flex">
+      <div class="element-wrapper">
+        <div class="element">
+          <h2>Top speed</h2>
+          {{stats.topSpeed}} knots
+        </div>
+      </div>
+
+      <div class="element-wrapper">
+        <div class="element">
+          <h2>Top altitude</h2>
+          {{stats.topAltitude}} feet
+        </div>
+      </div>
+    </div>
+
   </div>
 
 </div>

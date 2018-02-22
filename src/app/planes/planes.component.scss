@@ -1,0 +1,31 @@
+@import "../../variables.scss";
+
+.main-container {
+  text-align: center;
+}
+
+.wrapper {
+  .icao {
+    font-size: 30px;
+  }
+
+  .flights {
+    font-size: 10px;
+  }
+
+  h2 {
+    text-transform: uppercase;
+    margin: 0;
+    font-size: 15px;
+    font-weight: normal;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    padding: 1em;
+  }
+}

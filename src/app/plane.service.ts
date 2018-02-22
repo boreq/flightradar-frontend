@@ -12,6 +12,7 @@ export class PlaneService {
   private planeApiUrl = environment.baseApiUrl + "/plane/{icao}.json";
   private statsApiUrl = environment.baseApiUrl + "/stats.json";
   private polarApiUrl = environment.baseApiUrl + "/polar.json";
+  private rangeApiUrl = environment.baseApiUrl + "/range.json";
 
   constructor(private http: HttpClient) { }
 
@@ -32,6 +33,13 @@ export class PlaneService {
     params = params.set('from', Math.round(from.getTime() / 1000).toString())
     params = params.set('to', Math.round(to.getTime() / 1000).toString())
     return this.http.get<any>(this.polarApiUrl, { params: params });
+  }
+
+  getRange(from: Date, to: Date): Observable<any> {
+    let params = new HttpParams();
+    params = params.set('from', Math.round(from.getTime() / 1000).toString())
+    params = params.set('to', Math.round(to.getTime() / 1000).toString())
+    return this.http.get<any>(this.rangeApiUrl, { params: params });
   }
 
 }

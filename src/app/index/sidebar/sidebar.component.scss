@@ -12,10 +12,9 @@
     border-bottom: 1px solid $border-color;
     margin-top: 0;
 
-    .coords {
-      font-size: 10px;
+    .plane-view-link {
       float: right;
-      display: inline-block;
+      color: inherit;
     }
   }
 
@@ -74,10 +73,4 @@
       height: 100%;
     }
   }
-}
-
-app-coords {
-  font-size: 10px;
-  float: right;
-  display: inline-block;
 }

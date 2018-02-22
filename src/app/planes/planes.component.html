@@ -1,0 +1,24 @@
+<div class="main-container">
+  <app-pageheader title="Planes" fontAwesome="fa-plane"></app-pageheader>
+
+  <i *ngIf="recent === null" class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+
+  <div class="wrapper" *ngIf="recent !== null">
+
+    <h2>{{recent.length}} planes seen in the last {{recentNumberOfDays * 24}} hours</h2>
+
+    <ul>
+      <li *ngFor="let data of recent">
+        <div class="icao">
+          <a href="/plane/{{data.icao}}">
+            {{data.icao}}
+          </a>
+        </div>
+        <div *ngIf="data.flights.length > 0" class="flights dimmed">
+          {{data.flights.join(', ')}}
+        </div>
+      </li>
+    </ul>
+  </div>
+
+</div>
