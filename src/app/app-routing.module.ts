@@ -6,12 +6,12 @@ import { PlaneComponent }      from './plane/plane.component';
 
 const routes: Routes = [
   { path: '', component: IndexComponent },
-  { path: 'stats', component: StatsComponent }
-  { path: 'plane/:icao', component: PlaneComponent }
+  { path: 'stats', component: StatsComponent },
+  { path: 'plane/:icao', component: PlaneComponent },
 ];
 
 @NgModule({
   imports: [ RouterModule.forRoot(routes) ],
-  exports: [ RouterModule ]
+  exports: [ RouterModule ],
 })
 export class AppRoutingModule {}
