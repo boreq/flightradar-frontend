@@ -137,6 +137,9 @@ export class SidebarComponent implements OnInit {
             display: false,
             min: 0
           },
+          gridLines: {
+            tickMarkLength: 0
+          },
           position: "left",
           id: "y-axis-altitude",
         },
