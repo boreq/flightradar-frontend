@@ -12,8 +12,8 @@ import { CoordsComponent } from './index/sidebar/coords/coords.component'
 import { CoordsService } from './coords.service';
 import { PlaneComponent } from './plane/plane.component';
 import { PageheaderComponent } from './pageheader/pageheader.component';
-import {TimeAgoPipe} from 'time-ago-pipe';
 import { PlanesComponent } from './planes/planes.component';
+import { TimeAgoPipe } from './timeago.pipe';
 
 
 @NgModule({
@@ -25,8 +25,8 @@ import { PlanesComponent } from './planes/planes.component';
     CoordsComponent,
     PlaneComponent,
     PageheaderComponent,
-    TimeAgoPipe,
-    PlanesComponent
+    PlanesComponent,
+    TimeAgoPipe
   ],
   imports: [
     BrowserModule,
