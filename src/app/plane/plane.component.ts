@@ -67,6 +67,7 @@ export class PlaneComponent implements OnInit {
     let lastData = null;
     let lastTime = null;
     let flightDatasets = [];
+    let gap = 50000;
 
     let stats = new Stats();
 
@@ -100,10 +101,10 @@ export class PlaneComponent implements OnInit {
           speedDatasets.push(this.createMainDatasetSpeed());
           alitudeDatasets.push(this.createMainDatasetAltitude());
           datas.push([]);
-          lastTime += 50000;
+          lastTime += gap;
 
-          flightDatasets.push(this.createFlightDataset('rgba(0, 0, 0, 0)', 50000, null));
-          total += 50000;
+          flightDatasets.push(this.createFlightDataset('rgba(0, 0, 0, 0)', gap, null));
+          total += gap;
         } else {
           if (lastTime == null) {
             lastTime = Date.parse(data.time);
@@ -134,7 +135,6 @@ export class PlaneComponent implements OnInit {
 
       lastData = data;
     }
-
 
     // Fake bars for timerange.
     flightDatasets.push(this.getFlightDataset(datas, flightDatasets));
@@ -170,8 +170,9 @@ export class PlaneComponent implements OnInit {
             type: 'time',
             time: {
               min: min,
-              max: max
-            }
+              max: max,
+              unit: 'second'
+            },
           }],
           yAxes: [{
             display: true,
