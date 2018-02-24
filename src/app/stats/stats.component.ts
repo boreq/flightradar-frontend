@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { PlaneService } from '../plane.service';
 import { Stats } from '../plane';
+import { colors } from '../colors';
 
 declare var Chart: any;
 
@@ -27,49 +28,49 @@ export class StatsComponent implements OnInit {
     let labels = [];
 
     let dataPointsDataset = {
-      label: "Number of data points",
-      borderColor: 'rgb(231, 76, 60)',
-      backgroundColor: 'rgb(231, 76, 60)',
+      label: 'Number of collected data points',
+      borderColor: colors.red.rgb(),
+      backgroundColor: colors.red.rgb(),
       fill: false,
       data: [],
     };
 
     let planesDataset = {
-      label: "Number of unique planes",
-      borderColor: 'rgb(52, 152, 219)',
-      backgroundColor: 'rgb(52, 152, 219)',
+      label: 'Number of unique planes',
+      borderColor: colors.blue.rgb(),
+      backgroundColor: colors.blue.rgb(),
       fill: false,
       data: [],
     };
 
     let flightsDataset = {
-      label: "Number of unique flights",
-      borderColor: 'rgb(155, 89, 182)',
-      backgroundColor: 'rgb(155, 89, 182)',
+      label: 'Number of unique flights',
+      borderColor: colors.violet.rgb(),
+      backgroundColor: colors.violet.rgb(),
       fill: false,
       data: [],
     };
 
     let medianRangeDataset = {
-      label: "Median range",
-      borderColor: 'rgb(155, 89, 182)',
-      backgroundColor: 'rgb(155, 89, 182)',
+      label: 'Median range',
+      borderColor: colors.violet.rgb(),
+      backgroundColor: colors.violet.rgb(),
       fill: false,
       data: [],
     };
 
     let maxRangeDataset = {
-      label: "Max range",
-      borderColor: 'rgb(231, 76, 60)',
-      backgroundColor: 'rgb(231, 76, 60)',
+      label: 'Max range',
+      borderColor: colors.red.rgb(),
+      backgroundColor: colors.red.rgb(),
       fill: false,
       data: [],
     };
 
     let averageRangeDataset = {
-      label: "Average range",
-      borderColor: 'rgb(46, 204, 113)',
-      backgroundColor: 'rgb(46, 204, 113)',
+      label: 'Average range',
+      borderColor: colors.green.rgb(),
+      backgroundColor: colors.green.rgb(),
       fill: false,
       data: [],
     };
@@ -96,15 +97,15 @@ export class StatsComponent implements OnInit {
       }
     }
 
-    let colors = [
-      'rgb(26, 188, 156)',
-      'rgb(52, 152, 219)',
-      'rgb(46, 204, 113)',
-      'rgb(155, 89, 182)',
-      'rgb(52, 73, 94)',
-      'rgb(241, 196, 15)',
-      'rgb(230, 126, 34)',
-      'rgb(231, 76, 60)',
+    let colorsArray = [
+      colors.turquoise.rgb(),
+      colors.blue.rgb(),
+      colors.green.rgb(),
+      colors.violet.rgb(),
+      colors.asphalt.rgb(),
+      colors.yellow.rgb(),
+      colors.orange.rgb(),
+      colors.red.rgb(),
     ];
 
     // Create all needed cross section datasets
@@ -117,8 +118,8 @@ export class StatsComponent implements OnInit {
       }
       let dataset = {
         label: text,
-        borderColor: colors[i % colors.length],
-        backgroundColor: colors[i % colors.length],
+        borderColor: colorsArray[i % colorsArray.length],
+        backgroundColor: colorsArray[i % colorsArray.length],
         fill: false,
         data: [],
       };

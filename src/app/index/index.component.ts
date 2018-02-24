@@ -5,6 +5,7 @@ import { PlaneService } from '../plane.service';
 import { CoordsService } from '../coords.service';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { getNumberOfSecondsBetweenDates, calculateNewLonLat, kilometers } from '../utils';
+import { colors } from '../colors';
 
 // Station position.
 const position = {
@@ -637,7 +638,7 @@ export class IndexComponent implements OnInit {
     let style = new ol.style.Style({
       image: new ol.style.Circle({
         fill: new ol.style.Fill({
-          color: 'rgba(41, 128, 185, 1)'
+          color: colors.blue.rgb()
         }),
         radius: 3
       })
@@ -649,11 +650,11 @@ export class IndexComponent implements OnInit {
   private getRangePolygonStyle(): any {
     return new ol.style.Style({
       stroke: new ol.style.Stroke({
-        color: 'rgba(41, 128, 185, 0.5)',
+        color: colors.blue.rgba(0.5),
         width: 2
       }),
       fill: new ol.style.Fill({
-        color: 'rgba(41, 128, 185, 0.3)'
+        color: colors.blue.rgba(0.3)
       })
     });
   }
@@ -662,7 +663,7 @@ export class IndexComponent implements OnInit {
     let style = new ol.style.Style({
       image: new ol.style.Circle({
         fill: new ol.style.Fill({
-          color: 'rgba(214, 69, 65, 1)'
+          color: colors.red.rgb()
         }),
         radius: 5
       })

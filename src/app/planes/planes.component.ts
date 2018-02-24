@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
-import { PlaneService } from '../plane.service'
-import { StoredPlane } from '../plane'
+import { PlaneService } from '../plane.service';
+import { StoredPlane } from '../plane';
 
 class PlaneData {
   flights: string[] = [];
