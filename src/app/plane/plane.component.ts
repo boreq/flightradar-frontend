@@ -316,6 +316,8 @@ export class PlaneComponent implements OnInit {
       fill: false,
       data: [],
       yAxisID: yAxisID,
+      pointRadius: 0,
+      hoverRadius: 0,
     };
   }
 
