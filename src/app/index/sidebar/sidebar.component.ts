@@ -21,13 +21,56 @@ export class SidebarComponent implements OnInit {
   @Input() plane: Plane;
   previouslySeen: PreviouslySeen[];
 
+  private altitudeDataset: any;
+  private speedDataset: any;
+  private chart: any;
+
   constructor() { }
+
+  ngOnInit() {
+  }
+
+  private initCharts() {
+    if (this.chart) {
+      return;
+    }
+
+    this.altitudeDataset = {
+      label: "Altitude",
+      borderColor: 'rgb(231, 76, 60)',
+      backgroundColor: 'rgb(231, 76, 60)',
+      fill: false,
+      data: [],
+      pointRadius: 0,
+      yAxisID: 'y-axis-altitude',
+    };
+
+    this.speedDataset = {
+      label: "Speed",
+      borderColor: 'rgb(52, 152, 219)',
+      backgroundColor: 'rgb(52, 152, 219)',
+      fill: false,
+      data: [],
+      pointRadius: 0,
+      yAxisID: 'y-axis-speed',
+    };
+
+    this.chart = new Chart('chart-speed-altitude', {
+      type: 'line',
+      data: {
+        datasets: [this.altitudeDataset, this.speedDataset]
+      },
+      options: this.getChartOptions('Altitude and speed')
+    });
+  }
 
   @Input() set planeHistory(value: StoredPlane[]) {
     if (value === null) {
       this.previouslySeen == null;
       return;
     }
+
+    this.initCharts();
 
     // Generate the previously seen list.
     let flights = {};
@@ -58,25 +101,10 @@ export class SidebarComponent implements OnInit {
     this.previouslySeen = previouslySeen;
 
     // Generate data for the charts.
-    let altitudeDataset = {
-      label: "Altitude",
-      borderColor: 'rgb(231, 76, 60)',
-      backgroundColor: 'rgb(231, 76, 60)',
-      fill: false,
-      data: [],
-      pointRadius: 0,
-      yAxisID: 'y-axis-altitude',
-    };
-
-    let speedDataset = {
-      label: "Speed",
-      borderColor: 'rgb(52, 152, 219)',
-      backgroundColor: 'rgb(52, 152, 219)',
-      fill: false,
-      data: [],
-      pointRadius: 0,
-      yAxisID: 'y-axis-speed',
-    };
+    this.speedDataset.data.length = 0;
+    this.altitudeDataset.data.length = 0;
+    this.chart.options.scales.xAxes[0].time.max = new Date();
+    this.chart.options.scales.xAxes[0].time.min = new Date((new Date()).getTime() - numberOfMinutesOnTheYAxis * 60 * 1000);
 
     for (let data of value) {
       let t = getNumberOfSecondsBetweenDates(Date.parse(data.time), new Date());
@@ -85,28 +113,21 @@ export class SidebarComponent implements OnInit {
       }
 
       if (data.data.altitude) {
-        altitudeDataset.data.push({
+        this.altitudeDataset.data.push({
           x: new Date(data.time),
           y: data.data.altitude
         });
       }
 
       if (data.data.speed) {
-        speedDataset.data.push({
+        this.speedDataset.data.push({
           x: new Date(data.time),
           y: data.data.speed
         });
       }
     }
 
-    let chartAltitude = new Chart('chart-speed-altitude', {
-      type: 'line',
-      data: {
-        datasets: [altitudeDataset, speedDataset]
-      },
-      options: this.getChartOptions('Altitude and speed')
-    });
-
+    this.chart.update();
   }
 
   private getChartOptions(title: string): any {
@@ -162,9 +183,6 @@ export class SidebarComponent implements OnInit {
         intersect: true
       }
     };
-  }
-
-  ngOnInit() {
   }
 
 }
